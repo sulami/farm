@@ -3,10 +3,12 @@
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]))
 
-(defonce status
-  (atom {:money 1000
+(defonce state
+  (atom {:game-time 0
+         :money 1000
          :seeds 0
-         :produce 0
+         :food 100
+         :food-consumption 1
          :plants []}))
 
 ;; -------------------------
@@ -14,7 +16,7 @@
 
 (defn buy-seeds []
   (swap!
-   status
+   state
    (fn [current]
      (let [new-money (-> current :money (- 50))
            new-seeds (-> current :seeds (+ 200))]
@@ -26,7 +28,7 @@
 
 (defn plant-seeds []
   (swap!
-   status
+   state
    (fn [current]
      (let [new-seeds (-> current :seeds (- 80))
            current-plants (-> current :plants)
@@ -41,36 +43,60 @@
   (into plant
         {:age (-> plant :age inc)}))
 
-(defn grow-plants []
-  (swap!
-   status
-   (fn [current]
-     (into current
-           {:plants (->> current :plants (map grow-plant))}))))
-
 (defn harvest []
   (swap!
-   status
+   state
    (fn [current]
      (let* [current-plants (-> current :plants)
             new-plants (filter #(-> % :age (< 60)) current-plants)
             harvested (- (count current-plants) (count new-plants))
-            new-produce (-> current :produce (+ harvested))]
+            new-food (-> current :food (+ harvested))]
        (into current
-             {:produce new-produce
+             {:food new-food
               :plants new-plants})))))
 
 (defn sell []
   (swap!
-   status
+   state
    (fn [current]
-     (let [new-money (-> current :money (+ (-> current :produce (* 30))))]
+     (let [sold (-> current :food (* 30))
+           new-money (-> current :money (+ sold))]
        (into current
              {:money new-money
-              :produce 0})))))
+              :food 0})))))
+
+(defn grow-plants []
+  (swap!
+   state
+   (fn [current]
+     (into current
+           {:plants (->> current :plants (map grow-plant))}))))
+
+(defn consume-food []
+  (swap!
+   state
+   (fn [current]
+     (let [now (-> @state :game-time)
+           consumption (-> current :food-consumption)]
+       (if (-> now (mod 3) (= 0))
+         (into current
+               {:food (-> current :food (- consumption))})
+         current)))))
+
+(defn lose []
+  (js/alert "You starve."))
 
 (defonce timer
-  (js/setInterval grow-plants 1000))
+  (let [func (fn []
+               (swap! state
+                      (fn [current]
+                        (into current
+                              {:game-time (-> current :game-time inc)})))
+               (grow-plants)
+               (consume-food)
+               (when (-> @state :food (= 0))
+                 (lose)))]
+    (js/setInterval func 1000)))
 
 (defn draw-plant [plant]
   (let [age (-> plant :age)]
@@ -83,13 +109,13 @@
 ;; Views
 
 (defn game-page []
-  [:div [:h2 "Farm"]
+  [:div [:h2 "Medieval Farm"]
 
-   ;; Status
+   ;; State
    [:div
-    [:p (str "Money: $" (-> @status :money))]
-    [:p (str "Seeds: " (-> @status :seeds))]
-    [:p (str "Produce: " (-> @status :produce))]]
+    [:p (str "Money: $" (-> @state :money))]
+    [:p (str "Seeds: " (-> @state :seeds))]
+    [:p (str "Food: " (-> @state :food))]]
 
    ;; Actions
    [:div
@@ -103,14 +129,14 @@
              :value "Harvest"
              :on-click harvest}]
     [:input {:type "button"
-             :value "Sell produce"
+             :value "Sell food"
              :on-click sell}]]
 
    ;; Field
    [:div
     [:p
      (interleave
-      (map draw-plant (-> @status :plants))
+      (map draw-plant (-> @state :plants))
       (repeat " "))]]
    ])
 
