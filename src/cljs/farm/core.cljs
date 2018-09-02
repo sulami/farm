@@ -6,6 +6,7 @@
 (defonce status
   (atom {:money 1000
          :seeds 0
+         :produce 0
          :plants []}))
 
 ;; -------------------------
@@ -47,11 +48,27 @@
      (into current
            {:plants (->> current :plants (map grow-plant))}))))
 
+(defn harvest []
+  (swap!
+   status
+   (fn [current]
+     (let* [current-plants (-> current :plants)
+            new-plants (filter #(-> % :age (< 60)) current-plants)
+            harvested (- (count current-plants) (count new-plants))
+            new-produce (-> current :produce (+ harvested))]
+       (into current
+             {:produce new-produce
+              :plants new-plants})))))
+
 (defonce timer
   (js/setInterval grow-plants 1000))
 
 (defn draw-plant [plant]
-  plant)
+  (let [age (-> plant :age)]
+    (cond
+      (< age 30) "."
+      (< age 60) "i"
+      :else "I")))
 
 ;; -------------------------
 ;; Views
@@ -74,7 +91,8 @@
    ;; Status
    [:div
     [:p (str "Money: $" (-> @status :money))]
-    [:p (str "Seeds: " (-> @status :seeds))]]
+    [:p (str "Seeds: " (-> @status :seeds))]
+    [:p (str "Produce: " (-> @status :produce))]]
 
    ;; Actions
    [:div
@@ -83,7 +101,10 @@
              :on-click buy-seeds}]
     [:input {:type "button"
              :value "Plant seeds"
-             :on-click plant-seeds}]]
+             :on-click plant-seeds}]
+    [:input {:type "button"
+             :value "Harvest"
+             :on-click harvest}]]
 
    ;; Field
    [:div
