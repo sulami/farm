@@ -16,9 +16,11 @@
    (fn [current]
      (let [new-money (-> current :money (- 50))
            new-seeds (-> current :seeds (+ 200))]
-       (into current
-             {:money new-money
-              :seeds new-seeds})))))
+       (if (> 0 new-money)
+         current
+         (into current
+               {:money new-money
+                :seeds new-seeds}))))))
 
 ;; -------------------------
 ;; Views
