@@ -106,7 +106,16 @@
       :else "I")))
 
 (defn format-date [game-time]
-  (str "Day " (quot game-time 3)))
+  (str "Day "
+       (quot game-time 3)
+       " / "
+       ;; FIXME These aren't quite right...
+       (let [season (quot game-time 30)]
+         (cond
+           (-> season (mod 4) (= 0)) "Spring"
+           (-> season (mod 3) (= 0)) "Winter"
+           (-> season (mod 2) (= 0)) "Autumn"
+           :else "Summer"))))
 
 ;; -------------------------
 ;; Views
