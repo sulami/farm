@@ -60,6 +60,15 @@
              {:produce new-produce
               :plants new-plants})))))
 
+(defn sell []
+  (swap!
+   status
+   (fn [current]
+     (let [new-money (-> current :money (+ (-> current :produce (* 30))))]
+       (into current
+             {:money new-money
+              :produce 0})))))
+
 (defonce timer
   (js/setInterval grow-plants 1000))
 
@@ -72,18 +81,6 @@
 
 ;; -------------------------
 ;; Views
-
-(defn home-page []
-  [:div
-   [:h2 "Welcome to the Farm"]
-   [:ul
-    [:li [:a {:href "/game"} "Start farming"]]
-    [:li [:a {:href "/about"} "About"]]]])
-
-(defn about-page []
-  [:div [:h2 "About Farm"]
-   [:p "The Farm is all about farming. "
-    [:a {:href "/game"} "So start farming."]]])
 
 (defn game-page []
   [:div [:h2 "Farm"]
@@ -104,7 +101,10 @@
              :on-click plant-seeds}]
     [:input {:type "button"
              :value "Harvest"
-             :on-click harvest}]]
+             :on-click harvest}]
+    [:input {:type "button"
+             :value "Sell produce"
+             :on-click sell}]]
 
    ;; Field
    [:div
@@ -114,18 +114,19 @@
       (repeat " "))]]
    ])
 
+(defn about-page []
+  [:div [:h2 "About Farm"]
+   [:p "The Farm is all about farming."]])
+
 ;; -------------------------
 ;; Routes
 
-(defonce page (atom #'home-page))
+(defonce page (atom #'game-page))
 
 (defn current-page []
   [:div [@page]])
 
 (secretary/defroute "/" []
-  (reset! page #'home-page))
-
-(secretary/defroute "/game" []
   (reset! page #'game-page))
 
 (secretary/defroute "/about" []
