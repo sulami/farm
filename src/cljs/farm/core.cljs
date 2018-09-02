@@ -5,9 +5,9 @@
 
 (defonce state
   (atom {:game-time 0
-         :money 1000
-         :seeds 0
-         :food 100
+         :money 120
+         :seeds 250
+         :food 25
          :food-consumption 1
          :plants []}))
 
@@ -18,8 +18,8 @@
   (swap!
    state
    (fn [current]
-     (let [new-money (-> current :money (- 50))
-           new-seeds (-> current :seeds (+ 200))]
+     (let [new-money (-> current :money (- 8))
+           new-seeds (-> current :seeds (+ 10))]
        (if (> 0 new-money)
          current
          (into current
@@ -30,7 +30,7 @@
   (swap!
    state
    (fn [current]
-     (let [new-seeds (-> current :seeds (- 80))
+     (let [new-seeds (-> current :seeds (- 12))
            current-plants (-> current :plants)
            new-plants (->> [{:age 0}] (concat current-plants))]
        (if (> 0 new-seeds)
@@ -59,7 +59,7 @@
   (swap!
    state
    (fn [current]
-     (let [sold (-> current :food (* 30))
+     (let [sold (-> current :food (* 3))
            new-money (-> current :money (+ sold))]
        (into current
              {:money new-money
@@ -78,7 +78,7 @@
    (fn [current]
      (let [now (-> @state :game-time)
            consumption (-> current :food-consumption)]
-       (if (-> now (mod 3) (= 0))
+       (if (-> now (mod 3) (<= 0))
          (into current
                {:food (-> current :food (- consumption))})
          current)))))
@@ -105,6 +105,9 @@
       (< age 60) "i"
       :else "I")))
 
+(defn format-date [game-time]
+  (str "Day " (quot game-time 3)))
+
 ;; -------------------------
 ;; Views
 
@@ -113,7 +116,8 @@
 
    ;; State
    [:div
-    [:p (str "Money: $" (-> @state :money))]
+    [:p (-> @state :game-time format-date)]
+    [:p (str "Money: " (-> @state :money) "p")]
     [:p (str "Seeds: " (-> @state :seeds))]
     [:p (str "Food: " (-> @state :food))]]
 
