@@ -5,7 +5,8 @@
 
 (defonce status
   (atom {:money 1000
-         :seeds 0}))
+         :seeds 0
+         :plants []}))
 
 ;; -------------------------
 ;; Game functions
@@ -21,6 +22,36 @@
          (into current
                {:money new-money
                 :seeds new-seeds}))))))
+
+(defn plant-seeds []
+  (swap!
+   status
+   (fn [current]
+     (let [new-seeds (-> current :seeds (- 80))
+           current-plants (-> current :plants)
+           new-plants (->> [{:age 0}] (concat current-plants))]
+       (if (> 0 new-seeds)
+         current
+         (into current
+               {:seeds new-seeds
+                :plants new-plants}))))))
+
+(defn grow-plant [plant]
+  (into plant
+        {:age (-> plant :age inc)}))
+
+(defn grow-plants []
+  (swap!
+   status
+   (fn [current]
+     (into current
+           {:plants (->> current :plants (map grow-plant))}))))
+
+(defonce timer
+  (js/setInterval grow-plants 1000))
+
+(defn draw-plant [plant]
+  plant)
 
 ;; -------------------------
 ;; Views
@@ -49,7 +80,17 @@
    [:div
     [:input {:type "button"
              :value "Buy seeds"
-             :on-click buy-seeds}]]
+             :on-click buy-seeds}]
+    [:input {:type "button"
+             :value "Plant seeds"
+             :on-click plant-seeds}]]
+
+   ;; Field
+   [:div
+    [:p
+     (interleave
+      (map draw-plant (-> @status :plants))
+      (repeat " "))]]
    ])
 
 ;; -------------------------
