@@ -16,7 +16,6 @@
                    :age 18}]
          :plants []}))
 
-;; -------------------------
 ;; Game functions
 
 (defn time->season [game-time]
@@ -104,16 +103,15 @@
 
 (declare lose)
 
+(defn step []
+  (swap! state #(update-in % [:game-time] inc))
+  (grow-plants)
+  (consume-food)
+  (when (-> @state :food (= 0))
+    (lose)))
+
 (defonce timer
-  (let [func (fn []
-               (swap! state
-                      (fn [current]
-                        (update-in current [:game-time] inc)))
-               (grow-plants)
-               (consume-food)
-               (when (-> @state :food (= 0))
-                 (lose)))]
-    (js/setInterval func 1000)))
+  (js/setInterval step 1000))
 
 (defn lose []
   (js/clearInterval timer)
@@ -146,7 +144,6 @@
            2 "Autumn"
            3 "Winter"))))
 
-;; -------------------------
 ;; Views
 
 (defn game-page []
@@ -190,7 +187,6 @@
   [:div [:h2 "About Farm"]
    [:p "The Farm is all about farming."]])
 
-;; -------------------------
 ;; Routes
 
 (defonce page (atom #'game-page))
@@ -204,7 +200,6 @@
 (secretary/defroute "/about" []
   (reset! page #'about-page))
 
-;; -------------------------
 ;; Initialize app
 
 (defn mount-root []
