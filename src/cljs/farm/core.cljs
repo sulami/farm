@@ -7,6 +7,8 @@
 
 (declare food-price)
 
+(defonce length-of-day 6)
+
 (defonce state
   (atom {:game-time 0
          :money 120
@@ -23,7 +25,7 @@
 
 (defn time->season [game-time]
   (-> game-time
-      (quot 6)
+      (quot length-of-day)
       (quot 90)
       (mod 4)))
 
@@ -112,7 +114,7 @@
 
 (defn step []
   (swap! state #(update-in % [:game-time] inc))
-  (when (-> @state :game-time (mod 6) (= 0))
+  (when (-> @state :game-time (mod length-of-day) (= 0))
     ; New day
     (do
       (consume-food)
@@ -141,7 +143,7 @@
           (:age person)))
 
 (defn format-date [game-time]
-  (let* [days (quot game-time 6)
+  (let* [days (quot game-time length-of-day)
          year (+ 1 (quot days 360))
          day (+ 1 (mod days 360))
          season (time->season game-time)]
