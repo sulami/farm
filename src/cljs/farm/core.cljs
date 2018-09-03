@@ -1,14 +1,19 @@
 (ns farm.core
-    (:require [reagent.core :as reagent :refer [atom]]
-              [secretary.core :as secretary :include-macros true]
-              [accountant.core :as accountant]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [reagent.format :refer [format]]
+            [secretary.core :as secretary :include-macros true]
+            [accountant.core :as accountant]
+            [clojure.string :as str]))
 
 (defonce state
   (atom {:game-time 0
          :money 120
          :seeds 250
          :food 200
-         :food-consumption 1
+         :family [{:name "You"
+                   :age 20}
+                  {:name "Your wife"
+                   :age 18}]
          :plants []}))
 
 ;; -------------------------
@@ -76,8 +81,8 @@
   (swap!
    state
    (fn [current]
-     (let [now (-> @state :game-time)
-           consumption (-> current :food-consumption)]
+     (let [now (-> current :game-time)
+           consumption (-> current :family count)]
        (if (-> now (mod 6) (= 0))
          (into current
                {:food (-> current :food (- consumption))})
@@ -95,7 +100,7 @@
                (consume-food)
                (when (-> @state :food (= 0))
                  (lose)))]
-    (js/setInterval func 10)))
+    (js/setInterval func 1000)))
 
 (defn lose []
   (js/clearInterval timer)
@@ -107,6 +112,11 @@
       (< age 90) "."
       (< age 180) "i"
       :else [:a {:on-click lose} "I"])))
+
+(defn format-person [person]
+  (format "%s (%i)"
+          (:name person)
+          (:age person)))
 
 (defn format-date [game-time]
   (let* [days (quot game-time 6)
@@ -133,6 +143,9 @@
    [:div
     [:p (-> @state :game-time format-date)]
     [:table
+     [:tr (str "Family: " (->> @state :family
+                               (map format-person)
+                               (str/join ", ")))]
      [:tr (str "Money: " (-> @state :money) "p")]
      [:tr (str "Seeds: " (-> @state :seeds))]
      [:tr (str "Food: " (-> @state :food))]]]
