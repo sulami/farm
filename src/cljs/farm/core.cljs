@@ -10,6 +10,9 @@
 (defonce game-speed 1000) ; Real seconds per step
 (defonce length-of-day 6) ; Steps
 (defonce length-of-year 360) ; Days
+(defonce sapling-age 350) ; Steps
+(defonce plant-age 700) ; Steps
+(defonce optimal-temperature 19)
 
 (defonce state
   (atom {:game-time 0
@@ -44,7 +47,7 @@
        (+ (rand-int 6) (rand-int 6))))
 
 (defn temperature
-  "Sine wave temperature between 30 and -10 degrees."
+  "Sine wave temperature between 23 and 3 degrees."
   [game-time]
   (-> game-time
       (/ length-of-day)
@@ -52,8 +55,8 @@
       (/ length-of-year) ; %age of the year
       (* 2 Math/PI)
       Math/sin
-      (* 20) ; Modifier
-      (+ 10))) ; Baseline
+      (* 10) ; Modifier
+      (+ 13))) ; Baseline
 
 (defn buy-seeds []
   (swap!
@@ -80,11 +83,11 @@
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
-  Wheat grows best between 21 and 24 degrees. The formula makes the chance of
-  growth `-(temperature - 21)^2 + 90`%."
+  The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
+  step."
   [plant]
   (let* [roll (rand-int 100)
-         bar (-> @state :temperature (- 21) (Math/pow 2) (* -1) (+ 90))]
+         bar (-> @state :temperature (- optimal-temperature) (Math/pow 2) (* -1) (+ 90))]
     (if (> roll bar)
       plant
       (update-in plant [:age] inc))))
@@ -94,7 +97,7 @@
    state
    (fn [current]
      (let* [current-plants (-> current :plants)
-            new-plants (filter #(-> % :age (< 60)) current-plants)
+            new-plants (filter #(-> % :age (< plant-age)) current-plants)
             harvested (- (count current-plants) (count new-plants))
             new-food (-> current :food (+ harvested))]
        (into current
@@ -150,8 +153,8 @@
 (defn draw-plant [plant]
   (let [age (-> plant :age)]
     (cond
-      (< age 260) "."
-      (< age 520) "i"
+      (< age sapling-age) "."
+      (< age plant-age) "i"
       :else [:a {:on-click lose} "I"])))
 
 (defn format-person [person]
