@@ -5,9 +5,8 @@
             [accountant.core :as accountant]
             [clojure.string :as str]))
 
-(declare food-price)
-
 (defonce length-of-day 6)
+(defonce length-of-year 360) ; Days
 
 (defonce state
   (atom {:game-time 0
@@ -15,6 +14,7 @@
          :seeds 250
          :food 600
          :food-price 8
+         :temperature 10
          :family [{:name "You"
                    :age 20}
                   {:name "Your wife"
@@ -22,6 +22,11 @@
          :plants []}))
 
 ;; Game functions
+
+(defn set-in
+  "Like update in, but just sets."
+  [m ks v]
+  (update-in m ks (constantly v)))
 
 (defn time->season [game-time]
   (-> game-time
@@ -34,6 +39,18 @@
   [game-time]
   (max (+ (rand-int 6) (rand-int 6))
        (+ (rand-int 6) (rand-int 6))))
+
+(defn temperature
+  "Sine wave temperature between 30 and -10 degrees."
+  [game-time]
+  (-> game-time
+      (/ length-of-day)
+      (mod length-of-year)
+      (/ length-of-year)
+      (* 2 Math/PI)
+      Math/sin
+      (* 20)
+      (+ 10)))
 
 (defn buy-seeds []
   (swap!
@@ -118,7 +135,9 @@
     ; New day
     (do
       (consume-food)
-      (swap! state #(update-in % [:food-price] (constantly (food-price 0))))))
+      (swap! state #(set-in % [:food-price] (food-price 0)))
+      (swap! state #(set-in % [:temperature]
+                            (-> @state :game-time temperature)))))
   (grow-plants)
   (when (-> @state :food (= 0))
     (lose)))
@@ -144,8 +163,8 @@
 
 (defn format-date [game-time]
   (let* [days (quot game-time length-of-day)
-         year (+ 1 (quot days 360))
-         day (+ 1 (mod days 360))
+         year (+ 1 (quot days length-of-year))
+         day (+ 1 (mod days length-of-year))
          season (time->season game-time)]
     (str "Year " year
          " / "
@@ -172,7 +191,8 @@
      [:tr (format "Money: %ip" (-> @state :money))]
      [:tr (str "Seeds: " (-> @state :seeds))]
      [:tr (str "Food: " (-> @state :food))]
-     [:tr (format "Food price: %ip" (-> @state :food-price))]]]
+     [:tr (format "Food price: %ip" (-> @state :food-price))]
+     [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]]]
 
    ;; Actions
    [:div
