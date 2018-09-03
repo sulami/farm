@@ -29,13 +29,11 @@
   (swap!
    state
    (fn [current]
-     (let [new-money (-> current :money (- 8))
-           new-seeds (-> current :seeds (+ 10))]
-       (if (> 0 new-money)
-         current
-         (into current
-               {:money new-money
-                :seeds new-seeds}))))))
+     (if (-> current :money (< 8))
+       current
+       (-> current
+           (update-in [:money] #(- % 8))
+           (update-in [:seeds] #(+ % 10)))))))
 
 (defn plant-seeds []
   (swap!
@@ -92,8 +90,7 @@
   (swap!
    state
    (fn [current]
-     (into current
-           {:plants (->> current :plants (map grow-plant))}))))
+     (update-in current [:plants] #(map grow-plant %)))))
 
 (defn consume-food []
   (swap!
@@ -102,8 +99,7 @@
      (let [now (-> current :game-time)
            consumption (-> current :family count)]
        (if (-> now (mod 6) (= 0))
-         (into current
-               {:food (-> current :food (- consumption))})
+         (update-in current [:food] #(- % consumption))
          current)))))
 
 (declare lose)
@@ -112,8 +108,7 @@
   (let [func (fn []
                (swap! state
                       (fn [current]
-                        (into current
-                              {:game-time (-> current :game-time inc)})))
+                        (update-in current [:game-time] inc)))
                (grow-plants)
                (consume-food)
                (when (-> @state :food (= 0))
