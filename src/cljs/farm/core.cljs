@@ -5,11 +5,14 @@
             [accountant.core :as accountant]
             [clojure.string :as str]))
 
+(declare food-price)
+
 (defonce state
   (atom {:game-time 0
          :money 120
          :seeds 250
          :food 600
+         :food-price 8
          :family [{:name "You"
                    :age 20}
                   {:name "Your wife"
@@ -23,6 +26,12 @@
       (quot 6)
       (quot 90)
       (mod 4)))
+
+(defn food-price
+  "Determine the food price, max(2d6), 7-8ish."
+  [game-time]
+  (max (+ (rand-int 6) (rand-int 6))
+       (+ (rand-int 6) (rand-int 6))))
 
 (defn buy-seeds []
   (swap!
@@ -79,8 +88,9 @@
   (swap!
    state
    (fn [current]
-     (let [sold (-> current :food (* 3))
-           new-money (-> current :money (+ sold))]
+     (let* [sold (-> current :food)
+            made (-> current :food-price (* sold))
+            new-money (-> current :money (+ made))]
        (into current
              {:money new-money
               :food 0})))))
@@ -95,18 +105,19 @@
   (swap!
    state
    (fn [current]
-     (let [now (-> current :game-time)
-           consumption (-> current :family count)]
-       (if (-> now (mod 6) (= 0))
-         (update-in current [:food] #(- % consumption))
-         current)))))
+     (let [consumption (-> current :family count)]
+       (update-in current [:food] #(- % consumption))))))
 
 (declare lose)
 
 (defn step []
   (swap! state #(update-in % [:game-time] inc))
+  (when (-> @state :game-time (mod 6) (= 0))
+    ; New day
+    (do
+      (consume-food)
+      (swap! state #(update-in % [:food-price] (constantly (food-price 0))))))
   (grow-plants)
-  (consume-food)
   (when (-> @state :food (= 0))
     (lose)))
 
@@ -156,9 +167,10 @@
      [:tr (str "Family: " (->> @state :family
                                (map format-person)
                                (str/join ", ")))]
-     [:tr (str "Money: " (-> @state :money) "p")]
+     [:tr (format "Money: %ip" (-> @state :money))]
      [:tr (str "Seeds: " (-> @state :seeds))]
-     [:tr (str "Food: " (-> @state :food))]]]
+     [:tr (str "Food: " (-> @state :food))]
+     [:tr (format "Food price: %ip" (-> @state :food-price))]]]
 
    ;; Actions
    [:div
