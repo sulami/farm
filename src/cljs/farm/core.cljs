@@ -5,7 +5,10 @@
             [accountant.core :as accountant]
             [clojure.string :as str]))
 
-(defonce length-of-day 6)
+;; Constants
+
+(defonce game-speed 1000) ; Real seconds per step
+(defonce length-of-day 6) ; Steps
 (defonce length-of-year 360) ; Days
 
 (defonce state
@@ -45,12 +48,12 @@
   [game-time]
   (-> game-time
       (/ length-of-day)
-      (mod length-of-year)
-      (/ length-of-year)
+      (mod length-of-year) ; Day in the year
+      (/ length-of-year) ; %age of the year
       (* 2 Math/PI)
       Math/sin
-      (* 20)
-      (+ 10)))
+      (* 20) ; Modifier
+      (+ 10))) ; Baseline
 
 (defn buy-seeds []
   (swap!
@@ -76,20 +79,15 @@
                 :plants new-plants}))))))
 
 (defn grow-plant
-  "Grow a plant, depending on the current season."
+  "Grow a plant, depending on the current environment, and return it.
+  Wheat grows best between 21 and 24 degrees. The formula makes the chance of
+  growth `-(temperature - 21)^2 + 90`%."
   [plant]
   (let* [roll (rand-int 100)
-         grow-func (fn [rng]
-                     (if (>= rng roll)
-                       (-> plant :age inc)
-                       (-> plant :age)))]
-    (into
-     plant
-     {:age (case (-> @state :game-time time->season)
-             0 (grow-func 60)
-             1 (grow-func 80)
-             2 (grow-func 40)
-             3 (grow-func 10))})))
+         bar (-> @state :temperature (- 21) (Math/pow 2) (* -1) (+ 90))]
+    (if (> roll bar)
+      plant
+      (update-in plant [:age] inc))))
 
 (defn harvest []
   (swap!
@@ -143,7 +141,7 @@
     (lose)))
 
 (defonce timer
-  (js/setInterval step 1000))
+  (js/setInterval step game-speed))
 
 (defn lose []
   (js/clearInterval timer)
