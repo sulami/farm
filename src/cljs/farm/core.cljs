@@ -9,7 +9,7 @@
   (atom {:game-time 0
          :money 120
          :seeds 250
-         :food 200
+         :food 600
          :family [{:name "You"
                    :age 20}
                   {:name "Your wife"
@@ -18,6 +18,12 @@
 
 ;; -------------------------
 ;; Game functions
+
+(defn time->season [game-time]
+  (-> game-time
+      (quot 6)
+      (quot 90)
+      (mod 4)))
 
 (defn buy-seeds []
   (swap!
@@ -44,9 +50,21 @@
                {:seeds new-seeds
                 :plants new-plants}))))))
 
-(defn grow-plant [plant]
-  (into plant
-        {:age (-> plant :age inc)}))
+(defn grow-plant
+  "Grow a plant, depending on the current season."
+  [plant]
+  (let* [roll (rand-int 100)
+         grow-func (fn [rng]
+                     (if (>= rng roll)
+                       (-> plant :age inc)
+                       (-> plant :age)))]
+    (into
+     plant
+     {:age (case (-> @state :game-time time->season)
+             0 (grow-func 60)
+             1 (grow-func 80)
+             2 (grow-func 40)
+             3 (grow-func 10))})))
 
 (defn harvest []
   (swap!
@@ -109,8 +127,8 @@
 (defn draw-plant [plant]
   (let [age (-> plant :age)]
     (cond
-      (< age 90) "."
-      (< age 180) "i"
+      (< age 260) "."
+      (< age 520) "i"
       :else [:a {:on-click lose} "I"])))
 
 (defn format-person [person]
@@ -122,7 +140,7 @@
   (let* [days (quot game-time 6)
          year (+ 1 (quot days 360))
          day (+ 1 (mod days 360))
-         season (-> day (quot 90) (mod 4))]
+         season (time->season game-time)]
     (str "Year " year
          " / "
          "Day " day
