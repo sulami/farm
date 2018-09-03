@@ -101,9 +101,9 @@
 (defn draw-plant [plant]
   (let [age (-> plant :age)]
     (cond
-      (< age 30) "."
-      (< age 60) "i"
-      :else "I")))
+      (< age 90) "."
+      (< age 180) "i"
+      :else [:a {:on-click lose} "I"])))
 
 (defn format-date [game-time]
   (let* [days (quot game-time 6)
@@ -114,11 +114,11 @@
          " / "
          "Day " day
          " / "
-         (cond
-           (= season 0) "Spring"
-           (= season 1) "Summer"
-           (= season 2) "Autumn"
-           :else "Winter"))))
+         (case season
+           0 "Spring"
+           1 "Summer"
+           2 "Autumn"
+           3 "Winter"))))
 
 ;; -------------------------
 ;; Views
