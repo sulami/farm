@@ -83,8 +83,7 @@
                {:food (-> current :food (- consumption))})
          current)))))
 
-(defn lose []
-  (js/alert "You starve."))
+(declare lose)
 
 (defonce timer
   (let [func (fn []
@@ -96,7 +95,11 @@
                (consume-food)
                (when (-> @state :food (= 0))
                  (lose)))]
-    (js/setInterval func 1000)))
+    (js/setInterval func 10)))
+
+(defn lose []
+  (js/clearInterval timer)
+  (js/alert "You starve."))
 
 (defn draw-plant [plant]
   (let [age (-> plant :age)]
@@ -129,9 +132,10 @@
    ;; State
    [:div
     [:p (-> @state :game-time format-date)]
-    [:p (str "Money: " (-> @state :money) "p")]
-    [:p (str "Seeds: " (-> @state :seeds))]
-    [:p (str "Food: " (-> @state :food))]]
+    [:table
+     [:tr (str "Money: " (-> @state :money) "p")]
+     [:tr (str "Seeds: " (-> @state :seeds))]
+     [:tr (str "Food: " (-> @state :food))]]]
 
    ;; Actions
    [:div
