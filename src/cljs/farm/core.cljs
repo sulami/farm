@@ -7,7 +7,7 @@
   (atom {:game-time 0
          :money 120
          :seeds 250
-         :food 25
+         :food 200
          :food-consumption 1
          :plants []}))
 
@@ -78,7 +78,7 @@
    (fn [current]
      (let [now (-> @state :game-time)
            consumption (-> current :food-consumption)]
-       (if (-> now (mod 3) (<= 0))
+       (if (-> now (mod 6) (= 0))
          (into current
                {:food (-> current :food (- consumption))})
          current)))))
@@ -106,10 +106,13 @@
       :else "I")))
 
 (defn format-date [game-time]
-  (let* [day (quot game-time 3)
+  (let* [days (quot game-time 6)
+         year (+ 1 (quot days 360))
+         day (+ 1 (mod days 360))
          season (-> day (quot 90) (mod 4))]
-    (str "Day "
-         day
+    (str "Year " year
+         " / "
+         "Day " day
          " / "
          (cond
            (= season 0) "Spring"
