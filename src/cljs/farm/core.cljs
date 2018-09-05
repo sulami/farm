@@ -62,7 +62,8 @@
        (+ (rand-int 6) (rand-int 6))))
 
 (defn temperature
-  "Sine wave temperature between 23 and 3 degrees."
+  "Sine wave temperature between 23 and 3 degrees.
+  TODO fluctuations"
   [game-time]
   (-> game-time
       (mod length-of-year) ; Day in the year
@@ -109,21 +110,33 @@
    (fn [current]
      (let [new-seed (-> current :seed (- 12))
            current-plants (-> current :plants)
-           new-plants (concat current-plants [{:age 0}])]
+           new-plants (concat current-plants [{:age 0 :water 30}])]
        (if (> 0 new-seed)
          current
          (into current
                {:seed new-seed
                 :plants new-plants}))))))
 
+(defn water-plant
+  "Update water on a plant depending on the weather.
+  Plant will die (return `nil`) if water runs out."
+  [plant weather]
+  (update-in plant
+             [:water]
+             (case weather
+               :sunny #(max 0 (- % 2))
+               :rain inc
+               :hail inc
+               :thunderstorm inc
+               #(max 0 (- % 1)))))
+
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
   The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
-  step."
-  [plant]
+  step. TODO kill plants when it gets too hot/cold"
+  [plant weather temperature]
   (let* [roll (rand-int 100)
-         bar (-> @state
-                 :temperature
+         bar (-> temperature
                  (- optimal-temperature)
                  (Math/pow 2)
                  (* -1)
@@ -131,6 +144,24 @@
     (if (> roll bar)
       plant
       (update-in plant [:age] inc))))
+
+(defn plant-alive?
+  "Plants die if they drie out."
+  [plant]
+  (-> plant :water (> 0)))
+
+(defn grow-plants []
+  (swap!
+   state
+   (fn [current]
+     (let* [weather (-> current :weather)
+            temperature (-> current :temperature)]
+       (update-in current [:plants]
+                  (fn [plants]
+                    (->> plants
+                      (map #(grow-plant % weather temperature))
+                      (map #(water-plant % weather))
+                      (filter plant-alive?))))))))
 
 (defn harvest []
   (swap!
@@ -143,12 +174,6 @@
        (into current
              {:food new-food
               :plants new-plants})))))
-
-(defn grow-plants []
-  (swap!
-   state
-   (fn [current]
-     (update-in current [:plants] #(map grow-plant %)))))
 
 (defn consume-food []
   (swap!
@@ -164,11 +189,11 @@
   []
   (swap! state #(update-in % [:game-time] inc))
   (consume-food)
-  (swap! state #(set-in % [:food-price] (food-price 0)))
   (swap! state #(set-in % [:temperature]
                         (-> @state :game-time temperature)))
   (swap! state #(update-in % [:weather] weather))
   (grow-plants)
+  (swap! state #(set-in % [:food-price] (food-price 0)))
   (when (-> @state :food zero?)
     (lose)))
 
