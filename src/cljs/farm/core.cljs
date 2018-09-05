@@ -67,7 +67,11 @@
   (swap!
    state
    (fn [current]
-     (let* [item-price-key (-> item str (str/replace ":" "") (str "-price") keyword)
+     (let* [item-price-key (-> item
+                               str
+                               (str/replace-first ":" "")
+                               (str "-price")
+                               keyword)
             item-cost (-> current item-price-key (* number) (quot 10))]
        (if (-> current :money (< item-cost))
          current
