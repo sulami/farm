@@ -19,6 +19,7 @@
          :money 120
          :seeds 250
          :food 587
+         :seed-price 8
          :food-price 8
          :temperature 10
          :family [{:name "You"
@@ -58,15 +59,27 @@
       (* 10) ; Modifier
       (+ 13))) ; Baseline
 
-(defn buy-seeds []
+(defn buy-seeds [number]
   (swap!
    state
    (fn [current]
-     (if (-> current :money (< 8))
-       current
-       (-> current
-           (update-in [:money] #(- % 8))
-           (update-in [:seeds] #(+ % 10)))))))
+     (let [seed-cost (-> current :seed-price (* number) (quot 10))]
+       (if (-> current :money (< seed-cost))
+         current
+         (-> current
+             (update-in [:money] #(- % seed-cost))
+             (update-in [:seeds] #(+ % number))))))))
+
+(defn sell-food [number]
+  (swap!
+   state
+   (fn [current]
+     (let [food-cost (-> current :food-price (* number) (quot 10))]
+       (if (-> current :food (< number))
+         current
+         (-> current
+             (update-in [:money] #(+ % food-cost))
+             (update-in [:food] #(- % number))))))))
 
 (defn plant-seeds []
   (swap!
@@ -104,16 +117,6 @@
              {:food new-food
               :plants new-plants})))))
 
-(defn sell []
-  (swap!
-   state
-   (fn [current]
-     (let* [sold (-> current :food)
-            made (-> current :food-price (* sold))
-            new-money (-> current :money (+ made))]
-       (into current
-             {:money new-money
-              :food 0})))))
 
 (defn grow-plants []
   (swap!
@@ -190,25 +193,28 @@
                                (map format-person)
                                (str/join ", ")))]
      [:tr (format "Money: %ip" (-> @state :money))]
-     [:tr (str "Seeds: " (-> @state :seeds))]
-     [:tr (str "Food: " (-> @state :food))]
-     [:tr (format "Food price: %ip" (-> @state :food-price))]
+     [:tr
+      [:td (str "Seeds: " (-> @state :seeds))]
+      [:td (format "Price/10: %ip" (-> @state :seed-price))]
+      [:td [:input {:type "button"
+                    :value "Buy 10"
+                    :on-click #(buy-seeds 10)}]]]
+     [:tr
+      [:td (str "Food: " (-> @state :food))]
+      [:td (format "Price/10: %ip" (-> @state :food-price))]
+      [:td [:input {:type "button"
+                    :value "Sell 10"
+                    :on-click #(sell-food 10)}]]]
      [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]]]
 
    ;; Actions
    [:div
     [:input {:type "button"
-             :value "Buy seeds"
-             :on-click buy-seeds}]
-    [:input {:type "button"
-             :value "Plant seeds"
+             :value "Plant 12 seeds"
              :on-click plant-seeds}]
     [:input {:type "button"
              :value "Harvest"
-             :on-click harvest}]
-    [:input {:type "button"
-             :value "Sell food"
-             :on-click sell}]]
+             :on-click harvest}]]
 
    ;; Field
    [:div
