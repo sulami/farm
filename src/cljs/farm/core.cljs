@@ -18,7 +18,7 @@
   (atom {:game-time 0
          :money 120
          :seeds 250
-         :food 600
+         :food 587
          :food-price 8
          :temperature 10
          :family [{:name "You"
@@ -132,7 +132,7 @@
 
 (defn step []
   (swap! state #(update-in % [:game-time] inc))
-  (when (-> @state :game-time (mod length-of-day) (= 0))
+  (when (-> @state :game-time (mod length-of-day) zero?)
     ; New day
     (do
       (consume-food)
@@ -140,7 +140,7 @@
       (swap! state #(set-in % [:temperature]
                             (-> @state :game-time temperature)))))
   (grow-plants)
-  (when (-> @state :food (= 0))
+  (when (-> @state :food zero?)
     (lose)))
 
 (defonce timer
