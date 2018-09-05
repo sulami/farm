@@ -7,8 +7,7 @@
 
 ;; Constants
 
-(defonce game-speed 1000) ; Real seconds per step
-(defonce length-of-day 6) ; Steps
+(defonce game-speed 6000) ; Real seconds per game day
 (defonce length-of-year 360) ; Days
 (defonce sapling-age 350) ; Steps
 (defonce plant-age 700) ; Steps
@@ -40,7 +39,6 @@
 
 (defn time->season [game-time]
   (-> game-time
-      (quot length-of-day)
       (quot 90)
       (mod 4)))
 
@@ -49,7 +47,7 @@
   It's more likely to stay unchanged than to change, and there are certain
   probabilities for each different weather. Random beyond that."
   [current]
-  (rand-nth (concat (repeat 200 current)
+  (rand-nth (concat (repeat 100 current)
                     (repeat 8 :sunny)
                     (repeat 8 :clear)
                     (repeat 8 :overcast)
@@ -67,7 +65,6 @@
   "Sine wave temperature between 23 and 3 degrees."
   [game-time]
   (-> game-time
-      (/ length-of-day)
       (mod length-of-year) ; Day in the year
       (/ length-of-year) ; %age of the year
       (* 2 Math/PI)
@@ -158,16 +155,13 @@
 (declare lose)
 
 (defn step
-  "A step in the game world. Updates global state over time."
+  "A day in the game world. Updates global state over time."
   []
   (swap! state #(update-in % [:game-time] inc))
-  (when (-> @state :game-time (mod length-of-day) zero?)
-    ; New day
-    (do
-      (consume-food)
-      (swap! state #(set-in % [:food-price] (food-price 0)))
-      (swap! state #(set-in % [:temperature]
-                            (-> @state :game-time temperature)))))
+  (consume-food)
+  (swap! state #(set-in % [:food-price] (food-price 0)))
+  (swap! state #(set-in % [:temperature]
+                        (-> @state :game-time temperature)))
   (swap! state #(update-in % [:weather] weather))
   (grow-plants)
   (when (-> @state :food zero?)
@@ -193,9 +187,8 @@
           (:age person)))
 
 (defn format-date [game-time]
-  (let* [days (quot game-time length-of-day)
-         year (+ 1 (quot days length-of-year))
-         day (+ 1 (mod days length-of-year))
+  (let* [year (+ 1 (quot game-time length-of-year))
+         day (+ 1 (mod game-time length-of-year))
          season (time->season game-time)]
     (str "Year " year
          " / "
