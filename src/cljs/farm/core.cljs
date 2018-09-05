@@ -79,16 +79,25 @@
              (update-in [:money] #(- % item-cost))
              (update-in [item] #(+ % number))))))))
 
-(defn sell-food [number]
+(defn sell-item
+  "Sell `number` amount of `item` for the current price.
+  `:item` needs to be the key of the item counter in global state, and its price
+  needs to be `:{item}-price`."
+  [item number]
   (swap!
    state
    (fn [current]
-     (let [food-cost (-> current :food-price (* number) (quot 10))]
-       (if (-> current :food (< number))
+     (let* [item-price-key (-> item
+                               str
+                               (str/replace-first ":" "")
+                               (str "-price")
+                               keyword)
+            item-cost (-> current item-price-key (* number) (quot 10))]
+       (if (-> current item (< number))
          current
          (-> current
-             (update-in [:money] #(+ % food-cost))
-             (update-in [:food] #(- % number))))))))
+             (update-in [:money] #(+ % item-cost))
+             (update-in [item] #(- % number))))))))
 
 (defn plant-seeds []
   (swap!
@@ -207,7 +216,10 @@
       [:td (format "Price/10: %ip" (-> @state :seed-price))]
       [:td [:input {:type "button"
                     :value "Buy 10"
-                    :on-click #(buy-item :seed 10)}]]]
+                    :on-click #(buy-item :seed 10)}]]
+      [:td [:input {:type "button"
+                    :value "Sell 10"
+                    :on-click #(sell-item :seed 10)}]]]
      [:tr
       [:td (str "Food: " (-> @state :food))]
       [:td (format "Price/10: %ip" (-> @state :food-price))]
@@ -216,7 +228,7 @@
                     :on-click #(buy-item :food 10)}]]
       [:td [:input {:type "button"
                     :value "Sell 10"
-                    :on-click #(sell-food 10)}]]]
+                    :on-click #(sell-item :food 10)}]]]
      [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]]]
 
    ;; Actions
