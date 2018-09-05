@@ -17,7 +17,7 @@
 (defonce state
   (atom {:game-time 0
          :money 120
-         :seeds 250
+         :seed 250
          :food 587
          :seed-price 8
          :food-price 8
@@ -59,16 +59,21 @@
       (* 10) ; Modifier
       (+ 13))) ; Baseline
 
-(defn buy-seeds [number]
+(defn buy-item
+  "Buy `number` amount of `item` for the current price.
+  `:item` needs to be the key of the item counter in global state, and its price
+  needs to be `:{item}-price`."
+  [item number]
   (swap!
    state
    (fn [current]
-     (let [seed-cost (-> current :seed-price (* number) (quot 10))]
-       (if (-> current :money (< seed-cost))
+     (let* [item-price-key (-> item str (str/replace ":" "") (str "-price") keyword)
+            item-cost (-> current item-price-key (* number) (quot 10))]
+       (if (-> current :money (< item-cost))
          current
          (-> current
-             (update-in [:money] #(- % seed-cost))
-             (update-in [:seeds] #(+ % number))))))))
+             (update-in [:money] #(- % item-cost))
+             (update-in [item] #(+ % number))))))))
 
 (defn sell-food [number]
   (swap!
@@ -85,13 +90,13 @@
   (swap!
    state
    (fn [current]
-     (let [new-seeds (-> current :seeds (- 12))
+     (let [new-seed (-> current :seed (- 12))
            current-plants (-> current :plants)
            new-plants (->> [{:age 0}] (concat current-plants))]
-       (if (> 0 new-seeds)
+       (if (> 0 new-seed)
          current
          (into current
-               {:seeds new-seeds
+               {:seed new-seed
                 :plants new-plants}))))))
 
 (defn grow-plant
@@ -194,14 +199,17 @@
                                (str/join ", ")))]
      [:tr (format "Money: %ip" (-> @state :money))]
      [:tr
-      [:td (str "Seeds: " (-> @state :seeds))]
+      [:td (str "Seeds: " (-> @state :seed))]
       [:td (format "Price/10: %ip" (-> @state :seed-price))]
       [:td [:input {:type "button"
                     :value "Buy 10"
-                    :on-click #(buy-seeds 10)}]]]
+                    :on-click #(buy-item :seed 10)}]]]
      [:tr
       [:td (str "Food: " (-> @state :food))]
       [:td (format "Price/10: %ip" (-> @state :food-price))]
+      [:td [:input {:type "button"
+                    :value "Buy 10"
+                    :on-click #(buy-item :food 10)}]]
       [:td [:input {:type "button"
                     :value "Sell 10"
                     :on-click #(sell-food 10)}]]]
