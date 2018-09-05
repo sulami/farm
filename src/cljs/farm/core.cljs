@@ -99,7 +99,7 @@
    (fn [current]
      (let [new-seed (-> current :seed (- 12))
            current-plants (-> current :plants)
-           new-plants (->> [{:age 0}] (concat current-plants))]
+           new-plants (concat current-plants [{:age 0}])]
        (if (> 0 new-seed)
          current
          (into current
@@ -128,7 +128,6 @@
        (into current
              {:food new-food
               :plants new-plants})))))
-
 
 (defn grow-plants []
   (swap!
