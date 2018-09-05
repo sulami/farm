@@ -28,6 +28,7 @@
          :food-price 8
          ;; Farming
          :temperature 10
+         :weather :sunny
          :plants []}))
 
 ;; Game functions
@@ -42,6 +43,10 @@
       (quot length-of-day)
       (quot 90)
       (mod 4)))
+
+(defn weather
+  [current-weather]
+  current-weather)
 
 (defn food-price
   "Determine the food price, max(2d6), 7-8ish."
@@ -65,8 +70,7 @@
   "Convert a resource key to a resource price key, appending '-price'."
   [key]
   (-> key
-      str
-      (str/replace-first ":" "")
+      name
       (str "-price")
       keyword))
 
@@ -144,7 +148,9 @@
 
 (declare lose)
 
-(defn step []
+(defn step
+  "A step in the game world. Updates global state over time."
+  []
   (swap! state #(update-in % [:game-time] inc))
   (when (-> @state :game-time (mod length-of-day) zero?)
     ; New day
@@ -153,6 +159,7 @@
       (swap! state #(set-in % [:food-price] (food-price 0)))
       (swap! state #(set-in % [:temperature]
                             (-> @state :game-time temperature)))))
+  (swap! state #(update-in % [:weather] weather))
   (grow-plants)
   (when (-> @state :food zero?)
     (lose)))
@@ -219,7 +226,8 @@
      [:tr (format "Money: %ip" (-> @state :money))]
      (resource-block :seed)
      (resource-block :food)
-     [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]]]
+     [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
+     [:tr (format "Weather: %s" (-> @state :weather name str/capitalize))]]]
 
    ;; Actions
    [:div
