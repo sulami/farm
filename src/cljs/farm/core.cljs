@@ -122,7 +122,12 @@
   step."
   [plant]
   (let* [roll (rand-int 100)
-         bar (-> @state :temperature (- optimal-temperature) (Math/pow 2) (* -1) (+ 90))]
+         bar (-> @state
+                 :temperature
+                 (- optimal-temperature)
+                 (Math/pow 2)
+                 (* -1)
+                 (+ 90))]
     (if (> roll bar)
       plant
       (update-in plant [:age] inc))))
