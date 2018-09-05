@@ -16,16 +16,18 @@
 
 (defonce state
   (atom {:game-time 0
-         :money 120
-         :seed 250
-         :food 587
-         :seed-price 8
-         :food-price 8
-         :temperature 10
          :family [{:name "You"
                    :age 20}
                   {:name "Your wife"
                    :age 18}]
+         ;; Resources
+         :money 120
+         :seed 250
+         :seed-price 8
+         :food 587
+         :food-price 8
+         ;; Farming
+         :temperature 10
          :plants []}))
 
 ;; Game functions
@@ -59,45 +61,46 @@
       (* 10) ; Modifier
       (+ 13))) ; Baseline
 
-(defn buy-item
-  "Buy `number` amount of `item` for the current price.
-  `:item` needs to be the key of the item counter in global state, and its price
-  needs to be `:{item}-price`."
-  [item number]
-  (swap!
-   state
-   (fn [current]
-     (let* [item-price-key (-> item
-                               str
-                               (str/replace-first ":" "")
-                               (str "-price")
-                               keyword)
-            item-cost (-> current item-price-key (* number) (quot 10))]
-       (if (-> current :money (< item-cost))
-         current
-         (-> current
-             (update-in [:money] #(- % item-cost))
-             (update-in [item] #(+ % number))))))))
+(defn resource-price-key
+  "Convert a resource key to a resource price key, appending '-price'."
+  [key]
+  (-> key
+      str
+      (str/replace-first ":" "")
+      (str "-price")
+      keyword))
 
-(defn sell-item
-  "Sell `number` amount of `item` for the current price.
-  `:item` needs to be the key of the item counter in global state, and its price
-  needs to be `:{item}-price`."
-  [item number]
+(defn buy-resource
+  "Buy `number` amount of `resource` for the current price.
+  `:resource` needs to be the key of the resource counter in global state, and
+  its price needs to be `:{resource}-price`."
+  [resource number]
   (swap!
    state
    (fn [current]
-     (let* [item-price-key (-> item
-                               str
-                               (str/replace-first ":" "")
-                               (str "-price")
-                               keyword)
-            item-cost (-> current item-price-key (* number) (quot 10))]
-       (if (-> current item (< number))
+     (let* [price-key (resource-price-key resource)
+            resource-cost (-> current price-key (* number) (quot 10))]
+       (if (-> current :money (< resource-cost))
          current
          (-> current
-             (update-in [:money] #(+ % item-cost))
-             (update-in [item] #(- % number))))))))
+             (update-in [:money] #(- % resource-cost))
+             (update-in [resource] #(+ % number))))))))
+
+(defn sell-resource
+  "Sell `number` amount of `resource` for the current price.
+  `:resource` needs to be the key of the resource counter in global state, and
+  its price needs to be `:{resource}-price`."
+  [resource number]
+  (swap!
+   state
+   (fn [current]
+     (let* [price-key (resource-price-key resource)
+            resource-cost (-> current price-key (* number) (quot 10))]
+       (if (-> current resource (< number))
+         current
+         (-> current
+             (update-in [:money] #(+ % resource-cost))
+             (update-in [resource] #(- % number))))))))
 
 (defn plant-seeds []
   (swap!
@@ -200,6 +203,19 @@
 
 ;; Views
 
+(defn resource-block [resource]
+  (let [resource-name (-> resource str (str/replace-first ":" "") str/capitalize)
+        price-key (resource-price-key resource)]
+    [:tr
+     [:td (format "%s: %d" resource-name (-> @state resource))]
+     [:td (format "Price/10: %ip" (-> @state price-key))]
+     [:td [:input {:type "button"
+                   :value "Buy 10"
+                   :on-click #(buy-resource resource 10)}]]
+     [:td [:input {:type "button"
+                   :value "Sell 10"
+                   :on-click #(sell-resource resource 10)}]]]))
+
 (defn game-page []
   [:div [:h2 "Medieval Farm"]
 
@@ -211,24 +227,8 @@
                                (map format-person)
                                (str/join ", ")))]
      [:tr (format "Money: %ip" (-> @state :money))]
-     [:tr
-      [:td (str "Seeds: " (-> @state :seed))]
-      [:td (format "Price/10: %ip" (-> @state :seed-price))]
-      [:td [:input {:type "button"
-                    :value "Buy 10"
-                    :on-click #(buy-item :seed 10)}]]
-      [:td [:input {:type "button"
-                    :value "Sell 10"
-                    :on-click #(sell-item :seed 10)}]]]
-     [:tr
-      [:td (str "Food: " (-> @state :food))]
-      [:td (format "Price/10: %ip" (-> @state :food-price))]
-      [:td [:input {:type "button"
-                    :value "Buy 10"
-                    :on-click #(buy-item :food 10)}]]
-      [:td [:input {:type "button"
-                    :value "Sell 10"
-                    :on-click #(sell-item :food 10)}]]]
+     (resource-block :seed)
+     (resource-block :food)
      [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]]]
 
    ;; Actions
