@@ -37,6 +37,11 @@
   [m ks v]
   (update-in m ks (constantly v)))
 
+(defn avg [coll]
+  (if (empty? coll)
+    0
+    (/ (reduce + coll) (count coll))))
+
 (defn time->season [game-time]
   (-> game-time
       (quot 90)
@@ -259,7 +264,8 @@
      (resource-block :seed)
      (resource-block :food)
      [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
-     [:tr (format "Weather: %s" (-> @state :weather name str/capitalize))]]]
+     [:tr (format "Weather: %s" (-> @state :weather name str/capitalize))]
+     [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]
 
    ;; Actions
    [:div
@@ -268,6 +274,9 @@
              :on-click plant-seeds}]
     [:input {:type "button"
              :value "Harvest"
+             :on-click harvest}]
+    [:input {:type "button"
+             :value "Water plants"
              :on-click harvest}]]
 
    ;; Field
