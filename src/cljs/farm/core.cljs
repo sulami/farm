@@ -70,37 +70,28 @@
       (str "-price")
       keyword))
 
-(defn buy-resource
-  "Buy `number` amount of `resource` for the current price.
+(defn trade-resource
+  "Trade `number` amount of `resource` for the current price.
   `:resource` needs to be the key of the resource counter in global state, and
-  its price needs to be `:{resource}-price`."
-  [resource number]
+  its price needs to be `:{resource}-price`. Action must be either `:buy` or
+  `:sell`."
+  [action resource number]
   (swap!
    state
    (fn [current]
      (let* [price-key (resource-price-key resource)
             resource-cost (-> current price-key (* number) (quot 10))]
-       (if (-> current :money (< resource-cost))
-         current
-         (-> current
-             (update-in [:money] #(- % resource-cost))
-             (update-in [resource] #(+ % number))))))))
-
-(defn sell-resource
-  "Sell `number` amount of `resource` for the current price.
-  `:resource` needs to be the key of the resource counter in global state, and
-  its price needs to be `:{resource}-price`."
-  [resource number]
-  (swap!
-   state
-   (fn [current]
-     (let* [price-key (resource-price-key resource)
-            resource-cost (-> current price-key (* number) (quot 10))]
-       (if (-> current resource (< number))
-         current
-         (-> current
-             (update-in [:money] #(+ % resource-cost))
-             (update-in [resource] #(- % number))))))))
+       (case action
+         :buy (if (-> current :money (< resource-cost))
+                current
+                (-> current
+                    (update-in [:money] #(- % resource-cost))
+                    (update-in [resource] #(+ % number))))
+         :sell (if (-> current resource (< number))
+                 current
+                 (-> current
+                     (update-in [:money] #(+ % resource-cost))
+                     (update-in [resource] #(- % number)))))))))
 
 (defn plant-seeds []
   (swap!
@@ -211,10 +202,10 @@
      [:td (format "Price/10: %ip" (-> @state price-key))]
      [:td [:input {:type "button"
                    :value "Buy 10"
-                   :on-click #(buy-resource resource 10)}]]
+                   :on-click #(trade-resource :buy resource 10)}]]
      [:td [:input {:type "button"
                    :value "Sell 10"
-                   :on-click #(sell-resource resource 10)}]]]))
+                   :on-click #(trade-resource :sell resource 10)}]]]))
 
 (defn game-page []
   [:div [:h2 "Medieval Farm"]
