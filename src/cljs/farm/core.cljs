@@ -11,7 +11,11 @@
 (defonce length-of-year 360) ; Days
 (defonce sapling-age 350) ; Steps
 (defonce plant-age 700) ; Steps
+(defonce max-plant-water 30)
 (defonce optimal-temperature 19)
+
+(defonce new-plant {:age 0
+                    :water max-plant-water})
 
 (defonce state
   (atom {:game-time 0
@@ -115,20 +119,21 @@
    (fn [current]
      (let [new-seed (-> current :seed (- 12))
            current-plants (-> current :plants)
-           new-plants (concat current-plants [{:age 0 :water 30}])]
+           new-plants (concat current-plants [new-plant])]
        (if (> 0 new-seed)
          current
          (into current
                {:seed new-seed
                 :plants new-plants}))))))
 
-(defn water-plant
+(defn update-plant-water
   "Update water on a plant depending on the weather.
   Plant will die (return `nil`) if water runs out."
   [plant weather]
   (update-in plant
              [:water]
              (case weather
+               :manual #(min max-plant-water (+ % 10))
                :sunny #(max 0 (- % 2))
                :rain inc
                :hail inc
@@ -155,7 +160,7 @@
   [plant]
   (-> plant :water (> 0)))
 
-(defn grow-plants []
+(defn update-plants []
   (swap!
    state
    (fn [current]
@@ -165,8 +170,17 @@
                   (fn [plants]
                     (->> plants
                       (map #(grow-plant % weather temperature))
-                      (map #(water-plant % weather))
+                      (map #(update-plant-water % weather))
                       (filter plant-alive?))))))))
+
+(defn water-plants
+  "Manually water plants."
+  []
+  (swap!
+   state
+   (fn [current]
+     (update-in current [:plants]
+                (partial map #(update-plant-water % :manual))))))
 
 (defn harvest []
   (swap!
@@ -197,7 +211,7 @@
   (swap! state #(set-in % [:temperature]
                         (-> @state :game-time temperature)))
   (swap! state #(update-in % [:weather] weather))
-  (grow-plants)
+  (update-plants)
   (swap! state #(set-in % [:food-price] (food-price 0)))
   (when (-> @state :food (<= 0))
     (lose)))
@@ -277,7 +291,7 @@
              :on-click harvest}]
     [:input {:type "button"
              :value "Water plants"
-             :on-click harvest}]]
+             :on-click water-plants}]]
 
    ;; Field
    [:div
