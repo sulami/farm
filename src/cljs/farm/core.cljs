@@ -46,6 +46,33 @@
     0
     (/ (reduce + coll) (count coll))))
 
+(defn within-bounds
+  "Modifies a function to add a lower and upper bound to the result."
+  [f lower upper]
+  (fn [& args]
+    (-> f
+        (apply args)
+        (max lower)
+        (min upper))))
+
+(defn fuzz
+  "Fuzz a number within `amount` in either direction."
+  [n amount]
+  (-> amount
+      (* 2)
+      (+ 1)
+      rand-int
+      (- amount)
+      (+ n)))
+
+(defn fuzz-function
+  "Modify a function to fuzz the result."
+  [f amount]
+  (fn [& args]
+    (-> f
+        (apply args)
+        (fuzz amount))))
+
 (defn time->season [game-time]
   (-> game-time
       (quot 90)
@@ -125,14 +152,6 @@
          (into current
                {:seed new-seed
                 :plants new-plants}))))))
-
-(defn within-bounds
-  "Modifies a function to add a lower and upper bound to the result."
-  [f lower upper]
-  (fn [& args]
-    (-> (apply f args)
-        (max lower)
-        (min upper))))
 
 (defn update-plant-water
   "Update water on a plant depending on the weather."
