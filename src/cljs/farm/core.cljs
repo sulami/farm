@@ -150,7 +150,8 @@
                  (- optimal-temperature)
                  (Math/pow 2)
                  (* -1)
-                 (+ 90))]
+                 (+ 90)
+                 (+ (-> plant :water (quot 3))))]
     (if (> roll bar)
       plant
       (update-in plant [:age] inc))))
