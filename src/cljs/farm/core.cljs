@@ -126,19 +126,27 @@
                {:seed new-seed
                 :plants new-plants}))))))
 
+(defn within-bounds
+  "Modifies a function to add a lower and upper bound to the result."
+  [f lower upper]
+  (fn [& args]
+    (-> (apply f args)
+        (max lower)
+        (min upper))))
+
 (defn update-plant-water
-  "Update water on a plant depending on the weather.
-  Plant will die (return `nil`) if water runs out."
+  "Update water on a plant depending on the weather."
   [plant weather]
   (update-in plant
              [:water]
-             (case weather
-               :manual #(min max-plant-water (+ % 10))
-               :sunny #(max 0 (- % 2))
-               :rain inc
-               :hail inc
-               :thunderstorm inc
-               #(max 0 (- % 1)))))
+             (-> (case weather
+                   :manual #(+ % 10)
+                   :sunny #(- % 2)
+                   :rain inc
+                   :hail inc
+                   :thunderstorm inc
+                   #(- % 1))
+                 (within-bounds 0 max-plant-water))))
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
