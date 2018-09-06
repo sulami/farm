@@ -107,7 +107,8 @@
       (* 2 Math/PI)
       Math/sin
       (* 10) ; Modifier
-      (+ 13))) ; Baseline
+      (+ 13)
+      (fuzz 3))) ; Baseline
 
 (defn resource-price-key
   "Convert a resource key to a resource price key, appending '-price'."
