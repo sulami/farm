@@ -199,7 +199,7 @@
   (swap! state #(update-in % [:weather] weather))
   (grow-plants)
   (swap! state #(set-in % [:food-price] (food-price 0)))
-  (when (-> @state :food zero?)
+  (when (-> @state :food (<= 0))
     (lose)))
 
 (defonce timer
@@ -214,7 +214,7 @@
     (cond
       (< age sapling-age) "."
       (< age plant-age) "i"
-      :else [:a {:on-click lose} "I"])))
+      :else [:a {:on-click lose} "Y"])))
 
 (defn format-person [person]
   (format "%s (%i)"
