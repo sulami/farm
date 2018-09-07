@@ -9,8 +9,8 @@
 
 (defonce game-speed 3000) ; Real seconds per game day
 (defonce length-of-year 360) ; Days
-(defonce sapling-age 350) ; Steps
-(defonce plant-age 700) ; Steps
+(defonce sapling-age 73) ; Steps
+(defonce plant-age 146) ; Steps
 (defonce max-plant-water 30)
 (defonce optimal-temperature 19)
 
@@ -185,11 +185,12 @@
 
 (defn plant-alive?
   "Plants die if they drie out, or freeze.
-  Temperature-based death occurs the further temperature drops below 10
-  degrees."
+  Temperature-based death occurs the further temperature drops below 8 degrees."
   [plant weather temperature]
-  (and (-> plant :water (> 0))
-       (-> 10 rand-int (- temperature) (< 0))))
+  (let [freezing-temperature (if (-> plant :age (> plant-age))
+                               8 0)]
+    (and (-> plant :water (> 0))
+         (-> freezing-temperature rand-int (- temperature) (< 0)))))
 
 (defn update-plants []
   (swap!
@@ -310,6 +311,7 @@
      (resource-block :food)
      [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
      [:tr (format "Weather: %s" (-> @state :weather name str/capitalize))]
+     [:tr (format "Plants %i" (-> @state :plants count))]
      [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]
 
    ;; Actions
@@ -326,7 +328,7 @@
 
    ;; Field
    [:div
-    [:p
+    [:p {:style {:font-family "monospace"}}
      (interleave
       (map draw-plant (-> @state :plants))
       (repeat " "))]]
