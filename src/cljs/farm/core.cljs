@@ -7,7 +7,7 @@
 
 ;; Constants
 
-(defonce game-speed 6000) ; Real seconds per game day
+(defonce game-speed 3000) ; Real seconds per game day
 (defonce length-of-year 360) ; Days
 (defonce sapling-age 350) ; Steps
 (defonce plant-age 700) ; Steps
@@ -98,8 +98,7 @@
        (+ (rand-int 6) (rand-int 6))))
 
 (defn temperature
-  "Sine wave temperature between 23 and 3 degrees.
-  TODO fluctuations"
+  "Sine wave temperature between 23 and 3 degrees."
   [game-time]
   (-> game-time
       (mod length-of-year) ; Day in the year
@@ -171,7 +170,7 @@
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
   The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
-  step. TODO kill plants when it gets too hot/cold"
+  step."
   [plant weather temperature]
   (let* [roll (rand-int 100)
          bar (-> temperature
@@ -185,9 +184,12 @@
       (update-in plant [:age] inc))))
 
 (defn plant-alive?
-  "Plants die if they drie out."
-  [plant]
-  (-> plant :water (> 0)))
+  "Plants die if they drie out, or freeze.
+  Temperature-based death occurs the further temperature drops below 10
+  degrees."
+  [plant weather temperature]
+  (and (-> plant :water (> 0))
+       (-> 10 rand-int (- temperature) (< 0))))
 
 (defn update-plants []
   (swap!
@@ -200,7 +202,7 @@
                     (->> plants
                       (map #(grow-plant % weather temperature))
                       (map #(update-plant-water % weather))
-                      (filter plant-alive?))))))))
+                      (filter #(plant-alive? % weather temperature)))))))))
 
 (defn water-plants
   "Manually water plants."
