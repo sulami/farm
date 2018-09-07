@@ -13,3 +13,6 @@ pom.xml.asc
 *.log
 /.env
 /.sass-cache
+/*-init.clj
+/resources/public/js/compiled
+.rebel_readline_history
