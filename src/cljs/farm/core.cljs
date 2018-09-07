@@ -264,13 +264,15 @@
   (js/alert "You starve."))
 
 (defn draw-plant [plant]
-  (if (nil? plant)
-    "_"
-    (let [age (-> plant :age)]
-      (cond
-        (< age sapling-age) "."
-        (< age plant-age) "i"
-        :else [:a {:on-click lose} "Y"]))))
+  (let* [age (-> plant :age)
+         attrs (cond
+                 (nil? plant) {:char "_" :color "brown"}
+                 (< age sapling-age) {:char "." :color "brown"}
+                 (< age plant-age) {:char "i" :color "green"}
+                 :else {:char "Y" :color "green"})]
+    [:span
+     {:style {:color (-> attrs :color)}}
+     (-> attrs :char)]))
 
 (defn format-person [person]
   (format "%s (%i)"
