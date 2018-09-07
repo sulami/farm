@@ -9,6 +9,7 @@
 
 (defonce game-speed 3000) ; Real seconds per game day
 (defonce length-of-year 360) ; Days
+(defonce field-size 300)
 (defonce sapling-age 73) ; Steps
 (defonce plant-age 146) ; Steps
 (defonce max-plant-water 30)
@@ -32,7 +33,7 @@
          ;; Farming
          :temperature 10
          :weather :clear
-         :plants []}))
+         :plants (repeat field-size nil)}))
 
 ;; Game functions
 
@@ -42,9 +43,10 @@
   (update-in m ks (constantly v)))
 
 (defn avg [coll]
-  (if (empty? coll)
-    0
-    (/ (reduce + coll) (count coll))))
+  (let [filtered (filter #(-> % nil? not) coll)]
+    (if (empty? filtered)
+      0
+      (/ (reduce + filtered) (count filtered)))))
 
 (defn within-bounds
   "Modifies a function to add a lower and upper bound to the result."
@@ -146,7 +148,9 @@
    (fn [current]
      (let [new-seed (-> current :seed (- 12))
            current-plants (-> current :plants)
-           new-plants (concat current-plants [new-plant])]
+           new-plants (let* [head (take-while #(not (nil? %)) current-plants)
+                             tail (drop (+ 1 (count head)) current-plants)]
+                        (concat head [new-plant] tail))]
        (if (> 0 new-seed)
          current
          (into current
@@ -156,32 +160,36 @@
 (defn update-plant-water
   "Update water on a plant depending on the weather."
   [plant weather]
-  (update-in plant
-             [:water]
-             (-> (case weather
-                   :manual #(+ % 10)
-                   :sunny #(- % 2)
-                   :rain inc
-                   :hail inc
-                   :thunderstorm inc
-                   #(- % 1))
-                 (within-bounds 0 max-plant-water))))
+  (if (nil? plant)
+    nil
+    (update-in plant
+               [:water]
+               (-> (case weather
+                     :manual #(+ % 10)
+                     :sunny #(- % 2)
+                     :rain inc
+                     :hail inc
+                     :thunderstorm inc
+                     #(- % 1))
+                   (within-bounds 0 max-plant-water)))))
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
   The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
   step."
   [plant weather temperature]
-  (let* [roll (rand-int 100)
-         bar (-> temperature
-                 (- optimal-temperature)
-                 (Math/pow 2)
-                 (* -1)
-                 (+ 90)
-                 (+ (-> plant :water (quot 3))))]
-    (if (> roll bar)
-      plant
-      (update-in plant [:age] inc))))
+  (if (nil? plant)
+    nil
+    (let* [roll (rand-int 100)
+           bar (-> temperature
+                   (- optimal-temperature)
+                   (Math/pow 2)
+                   (* -1)
+                   (+ 90)
+                   (+ (-> plant :water (quot 3))))]
+      (if (> roll bar)
+        plant
+        (update-in plant [:age] inc)))))
 
 (defn plant-alive?
   "Plants die if they drie out, or freeze.
@@ -190,7 +198,7 @@
   (let [freezing-temperature (if (-> plant :age (> plant-age))
                                8 0)]
     (and (-> plant :water (> 0))
-         (-> freezing-temperature rand-int (- temperature) (< 0)))))
+         (-> freezing-temperature rand-int (- temperature) neg?))))
 
 (defn update-plants []
   (swap!
@@ -201,9 +209,9 @@
        (update-in current [:plants]
                   (fn [plants]
                     (->> plants
-                      (map #(grow-plant % weather temperature))
-                      (map #(update-plant-water % weather))
-                      (filter #(plant-alive? % weather temperature)))))))))
+                         (map #(grow-plant % weather temperature))
+                         (map #(update-plant-water % weather))
+                         (map #(if (plant-alive? % weather temperature) % nil)))))))))
 
 (defn water-plants
   "Manually water plants."
@@ -256,11 +264,13 @@
   (js/alert "You starve."))
 
 (defn draw-plant [plant]
-  (let [age (-> plant :age)]
-    (cond
-      (< age sapling-age) "."
-      (< age plant-age) "i"
-      :else [:a {:on-click lose} "Y"])))
+  (if (nil? plant)
+    "_"
+    (let [age (-> plant :age)]
+      (cond
+        (< age sapling-age) "."
+        (< age plant-age) "i"
+        :else [:a {:on-click lose} "Y"]))))
 
 (defn format-person [person]
   (format "%s (%i)"
