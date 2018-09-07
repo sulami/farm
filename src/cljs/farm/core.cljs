@@ -328,6 +328,8 @@
    [:div
     [:input {:type "button"
              :value "Plant 12 seeds"
+             :disabled (or (-> @state :seed (< 12))
+                           (->> @state :plants (filter nil?) empty?))
              :on-click plant-seeds}]
     [:input {:type "button"
              :value "Harvest"
@@ -341,8 +343,7 @@
     [:p {:style {:font-family "monospace"}}
      (interleave
       (map draw-plant (-> @state :plants))
-      (repeat " "))]]
-   ])
+      (repeat " "))]]])
 
 (defn about-page []
   [:div [:h2 "About Farm"]
