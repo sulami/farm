@@ -12,10 +12,6 @@
 (defonce timer
   (js/setInterval #(dispatch [:step]) config/game-speed))
 
-#_(defn lose []
-  (js/clearInterval timer)
-  (js/alert "You starve."))
-
 (defn format-person [person]
   (format "%s (%i)"
           (:name person)
