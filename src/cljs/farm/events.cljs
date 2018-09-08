@@ -1,30 +1,27 @@
 (ns farm.events
-  (:require [re-frame.core :as re-frame :refer [reg-event-db]]
-            [farm.db :as db]))
+  (:require [re-frame.core :as re-frame :refer [reg-event-db reg-event-fx]]
+            [farm.db :as db]
+            [farm.economy :refer [consume-food]]))
 
 (reg-event-db
  :initialize-db
  (fn [_ _]
    db/default-db))
 
-(reg-event-db
+(reg-event-fx
  :step
- (fn []
-   (prn "step")
-   #_(swap! state #(update-in % [:game-time] inc))
-   #_(consume-food)
-   #_(swap! state #(set-in % [:temperature]
-                         (-> @state :game-time temperature)))
-   #_(swap! state #(update-in % [:weather] weather))
-   #_(update-plants)
-   #_(swap! state #(set-in % [:food-price] (food-price 0)))
-   #_(when (-> @state :food (<= 0))
-     (lose))))
+ (fn [_ _]
+   {:dispatch [:consume-food]}))
 
 (reg-event-db
  :trade-resource
- (fn [action resource amount]
-   (prn "trade-resource")))
+ (fn [db [_ action resource amount]]
+   (prn action resource amount)
+   db))
+
+(reg-event-db
+ :consume-food
+ consume-food)
 
 ;; (defn trade-resource
 ;;   "Trade `number` amount of `resource` for the current price.
@@ -97,10 +94,3 @@
 ;;        (into current
 ;;              {:food new-food
 ;;               :plants new-plants})))))
-
-;; (defn consume-food []
-;;   (swap!
-;;    state
-;;    (fn [current]
-;;      (let [consumption (-> current :family count)]
-;;        (update-in current [:food] #(- % consumption))))))

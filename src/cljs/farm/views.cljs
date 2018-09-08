@@ -5,25 +5,12 @@
    [re-frame.core :as re-frame :refer [dispatch subscribe]]
    [farm.climate :refer [time->season]]
    [farm.config :as config]
+   [farm.economy :refer [resource-price-key]]
    [farm.subs :as subs]
    [farm.utils :refer [set-in avg]]))
 
-(defn food-price
-  "Determine the food price, max(2d6), 7-8ish."
-  [game-time]
-  (max (+ (rand-int 6) (rand-int 6))
-       (+ (rand-int 6) (rand-int 6))))
-
-(defn resource-price-key
-  "Convert a resource key to a resource price key, appending '-price'."
-  [key]
-  (-> key
-      name
-      (str "-price")
-      keyword))
-
-#_(defonce timer
-  (js/setInterval #(dispatch :step) game-speed))
+(defonce timer
+  (js/setInterval #(dispatch [:step]) config/game-speed))
 
 #_(defn lose []
   (js/clearInterval timer)
@@ -101,7 +88,7 @@
                :on-click #(dispatch [:plant-seeds])}]
       [:input {:type "button"
                :value "Harvest"
-               :on-click #(dispatch [:harvest])}]
+               :on-click #(dispatch [:step])}]
       [:input {:type "button"
                :value "Water plants"
                :on-click #(dispatch [:water-plants])}]]
