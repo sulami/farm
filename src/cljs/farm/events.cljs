@@ -2,7 +2,7 @@
   (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
             [farm.db :as db]
             [farm.economy :refer [consume-food trade-resource]]
-            [farm.plant :refer [plant-seeds]]))
+            [farm.plant :refer [plant-seeds water-plants]]))
 
 (reg-event-db
  :initialize-db
@@ -33,6 +33,10 @@
  :plant-seeds
  plant-seeds)
 
+(reg-event-db
+ :water-plants
+ water-plants)
+
 ;; (defn update-plants []
 ;;   (swap!
 ;;    state
@@ -45,15 +49,6 @@
 ;;                          (map #(grow-plant % weather temperature))
 ;;                          (map #(update-plant-water % weather))
 ;;                          (map #(if (plant-alive? % weather temperature) % nil)))))))))
-
-;; (defn water-plants
-;;   "Manually water plants."
-;;   []
-;;   (swap!
-;;    state
-;;    (fn [current]
-;;      (update-in current [:plants]
-;;                 (partial map #(update-plant-water % :manual))))))
 
 ;; (defn harvest []
 ;;   (swap!

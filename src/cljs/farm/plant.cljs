@@ -32,6 +32,12 @@
                      #(- % 1))
                    (within-bounds 0 config/max-plant-water)))))
 
+(defn water-plants
+  "Manually water plants."
+  [db _]
+  (update-in db[:plants]
+             (partial map #(update-plant-water % :manual))))
+
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
   The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
