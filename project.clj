@@ -14,12 +14,19 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
-  :figwheel {:css-dirs ["resources/public/css"]}
+  :figwheel
+  {:http-server-root "public"
+   :server-port 3449
+   :nrepl-port 7002
+   :nrepl-middleware [cider.piggieback/wrap-cljs-repl]
+   :css-dirs ["resource/public/css"]
+   :ring-handler farm.handler/app}
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.9.10"]]
-
+   {:dependencies [[cider/piggieback "0.3.8"]
+                   [figwheel-sidecar "0.5.16"]
+                   [binaryage/devtools "0.9.10"]]
     :plugins      [[lein-figwheel "0.5.16"]]}
    :prod { }
    }
@@ -32,8 +39,7 @@
   {:builds
    [{:id           "dev"
      :source-paths ["src/cljs"]
-     :figwheel     {:on-jsload "farm.core/mount-root"
-                    :css-dirs ["resource/public/css"]}
+     :figwheel     {:on-jsload "farm.core/mount-root"}
      :compiler     {:main                 farm.core
                     :output-to            "resources/public/js/compiled/app.js"
                     :output-dir           "resources/public/js/compiled/out"
