@@ -19,3 +19,23 @@
       name
       (str "-price")
       keyword))
+
+(defn trade-resource
+  "Trade `number` amount of `resource` for the current price.
+  `:resource` needs to be the key of the resource counter in global state, and
+  its price needs to be `:{resource}-price`. Action must be either `:buy` or
+  `:sell`."
+  [db [_ action resource number]]
+  (let* [price-key (resource-price-key resource)
+         resource-cost (-> db price-key (* number) (quot 10))]
+    (case action
+      :buy (if (-> db :money (< resource-cost))
+             db
+             (-> db
+                 (update-in [:money] #(- % resource-cost))
+                 (update-in [resource] #(+ % number))))
+      :sell (if (-> db resource (< number))
+              db
+              (-> db
+                  (update-in [:money] #(+ % resource-cost))
+                  (update-in [resource] #(- % number)))))))

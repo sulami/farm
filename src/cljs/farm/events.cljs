@@ -1,7 +1,7 @@
 (ns farm.events
-  (:require [re-frame.core :as re-frame :refer [reg-event-db reg-event-fx]]
+  (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
             [farm.db :as db]
-            [farm.economy :refer [consume-food]]))
+            [farm.economy :refer [consume-food trade-resource]]))
 
 (reg-event-db
  :initialize-db
@@ -11,40 +11,22 @@
 (reg-event-fx
  :step
  (fn [_ _]
-   {:dispatch [:consume-food]}))
+   {:dispatch-n
+    (list [:inc-game-time]
+          [:consume-food])}))
 
 (reg-event-db
- :trade-resource
- (fn [db [_ action resource amount]]
-   (prn action resource amount)
-   db))
+ :inc-game-time
+ (fn [db _]
+   (update-in db [:game-time] inc)))
 
 (reg-event-db
  :consume-food
  consume-food)
 
-;; (defn trade-resource
-;;   "Trade `number` amount of `resource` for the current price.
-;;   `:resource` needs to be the key of the resource counter in global state, and
-;;   its price needs to be `:{resource}-price`. Action must be either `:buy` or
-;;   `:sell`."
-;;   [action resource number]
-;;   (swap!
-;;    state
-;;    (fn [current]
-;;      (let* [price-key (resource-price-key resource)
-;;             resource-cost (-> current price-key (* number) (quot 10))]
-;;        (case action
-;;          :buy (if (-> current :money (< resource-cost))
-;;                 current
-;;                 (-> current
-;;                     (update-in [:money] #(- % resource-cost))
-;;                     (update-in [resource] #(+ % number))))
-;;          :sell (if (-> current resource (< number))
-;;                  current
-;;                  (-> current
-;;                      (update-in [:money] #(+ % resource-cost))
-;;                      (update-in [resource] #(- % number)))))))))
+(reg-event-db
+ :trade-resource
+ trade-resource)
 
 ;; (defn plant-seeds []
 ;;   (swap!
