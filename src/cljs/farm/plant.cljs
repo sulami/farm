@@ -57,10 +57,34 @@
         (update-in plant [:age] inc)))))
 
 (defn plant-alive?
-  "Plants die if they drie out, or freeze.
+  "Return plant life status. Plants die if they drie out, or freeze.
   Temperature-based death occurs the further temperature drops below 8 degrees."
   [plant weather temperature]
   (let [freezing-temperature (if (-> plant :age (> config/plant-age))
                                8 0)]
     (and (-> plant :water (> 0))
          (-> freezing-temperature rand-int (- temperature) neg?))))
+
+(defn update-plants
+  "Update all plants."
+  [db _]
+  (let* [weather (-> db :weather)
+         temperature (-> db :temperature)]
+    (update-in db [:plants]
+               (fn [plants]
+                 (->> plants
+                      (map #(grow-plant % weather temperature))
+                      (map #(update-plant-water % weather))
+                      (map #(if (plant-alive? % weather temperature) % nil)))))))
+
+;; (defn harvest []
+;;   (swap!
+;;    state
+;;    (fn [current]
+;;      (let* [current-plants (-> current :plants)
+;;             new-plants (filter #(-> % :age (< config/plant-age)) current-plants)
+;;             harvested (- (count current-plants) (count new-plants))
+;;             new-food (-> current :food (+ harvested))]
+;;        (into current
+;;              {:food new-food
+;;               :plants new-plants})))))
