@@ -2,6 +2,20 @@
   (:require [farm.config :as config]
             [farm.utils :refer [within-bounds]]))
 
+(defn plant-seeds
+  "Plant some plants."
+  [db _]
+  (let [new-seed (-> db :seed (- 12))
+        current-plants (-> db :plants)
+        new-plants (let* [head (take-while #(not (nil? %)) current-plants)
+                          tail (drop (+ 1 (count head)) current-plants)]
+                     (concat head [config/new-plant] tail))]
+    (if (> 0 new-seed)
+      db
+      (into db
+            {:seed new-seed
+             :plants new-plants}))))
+
 (defn update-plant-water
   "Update water on a plant depending on the weather."
   [plant weather]

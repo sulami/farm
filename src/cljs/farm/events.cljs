@@ -1,7 +1,8 @@
 (ns farm.events
   (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
             [farm.db :as db]
-            [farm.economy :refer [consume-food trade-resource]]))
+            [farm.economy :refer [consume-food trade-resource]]
+            [farm.plant :refer [plant-seeds]]))
 
 (reg-event-db
  :initialize-db
@@ -28,20 +29,9 @@
  :trade-resource
  trade-resource)
 
-;; (defn plant-seeds []
-;;   (swap!
-;;    state
-;;    (fn [current]
-;;      (let [new-seed (-> current :seed (- 12))
-;;            current-plants (-> current :plants)
-;;            new-plants (let* [head (take-while #(not (nil? %)) current-plants)
-;;                              tail (drop (+ 1 (count head)) current-plants)]
-;;                         (concat head [config/new-plant] tail))]
-;;        (if (> 0 new-seed)
-;;          current
-;;          (into current
-;;                {:seed new-seed
-;;                 :plants new-plants}))))))
+(reg-event-db
+ :plant-seeds
+ plant-seeds)
 
 ;; (defn update-plants []
 ;;   (swap!
