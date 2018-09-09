@@ -7,7 +7,7 @@
    [farm.config :as config]
    [farm.economy :refer [resource-price-key]]
    [farm.subs :as subs]
-   [farm.utils :refer [set-in avg]]))
+   [farm.utils :refer [avg]]))
 
 (defonce timer
   (js/setInterval #(dispatch [:step]) config/game-speed))
@@ -58,7 +58,7 @@
 
 (defn game-page []
   (let [state (subscribe [:state])]
-    [:div #_[:h2 "Medieval Farm"]
+    [:div [:h2 "Medieval Farm"]
 
      ;; State
      [:div
