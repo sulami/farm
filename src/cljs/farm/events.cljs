@@ -9,14 +9,14 @@
 
 (reg-event-db
  :initialize-db
- (fn [_ _]
+ (fn initialize-db-handler [_ _]
    db/default-db))
 
 ;; Iterations
 
 (reg-event-fx
  :step
- (fn [_ _]
+ (fn step-handler [_ _]
    {:dispatch-n
     (list [:inc-game-time]
           [:update-weather]
@@ -28,17 +28,17 @@
 
 (reg-event-db
  :inc-game-time
- (fn [db _]
+ (fn inc-game-time-handler [db _]
    (update-in db [:game-time] inc)))
 
 (reg-event-db
  :update-weather
- (fn [db _]
+ (fn update-weather-handler [db _]
    (update-in db [:weather] weather)))
 
 (reg-event-db
  :update-temperature
- (fn [db _]
+ (fn update-temperature-handler [db _]
    (set-in db [:temperature] (-> db :game-time temperature))))
 
 (reg-event-db
@@ -47,7 +47,7 @@
 
 (reg-event-db
  :update-prices
- (fn [db _]
+ (fn update-prices-handler [db _]
    (set-in db [:food-price] (food-price))))
 
 (reg-event-db
@@ -56,7 +56,7 @@
 
 (reg-event-fx
  :check-lose
- (fn [{:keys [db]} _]
+ (fn check-lose-handler [{:keys [db]} _]
    (when (-> db :food (<= 0))
      (js/clearInterval timer)
      (js/alert "You starve."))))
