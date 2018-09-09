@@ -12,6 +12,22 @@
 (defonce timer
   (js/setInterval #(dispatch [:step]) config/game-speed))
 
+(defn cljs->rgb
+  "Build an RGB(A) color attribute from numbers."
+  ([r g b] (format "rgb(%i,%i,%i)" r g b))
+  ([r g b a] (format "rgba(%i,%i,%i,%i)" r g b a)))
+
+(defn plant-color
+  "Return a plant color RGB vector depending on the water status."
+  [water]
+  (let [f (fn [start end]
+            (-> start
+                (- end)
+                (* water)
+                (quot config/max-plant-water)
+                (+ end)))]
+    (map f config/plant-green config/plant-brown)))
+
 (defn format-person [person]
   (format "%s (%i)"
           (:name person)
@@ -33,10 +49,11 @@
 
 (defn draw-plant [plant]
   (let* [age (-> plant :age)
+         color (->> plant :water plant-color (apply cljs->rgb))
          attrs (cond
                  (nil? plant) {:char "_" :color "brown"}
-                 (< age config/sapling-age) {:char "." :color "brown"}
-                 (< age config/plant-age) {:char "i" :color "green"}
+                 (< age config/sapling-age) {:char "." :color color}
+                 (< age config/plant-age) {:char "i" :color color}
                  :else {:char "Y" :color "green"})]
     [:span
      {:style {:color (-> attrs :color)}}

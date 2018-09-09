@@ -10,6 +10,8 @@
 (defonce plant-age 146) ; Steps
 (defonce max-plant-water 30)
 (defonce optimal-temperature 19)
+(defonce plant-green [20 160 80])
+(defonce plant-brown [200 150 30])
 
 (defonce new-plant {:age 0
                     :water max-plant-water})
