@@ -3,12 +3,12 @@
             [farm.utils :refer [within-bounds]]))
 
 (defn plant-seeds
-  "Plant some plants."
-  [db _]
-  (let [new-seed (-> db :seed (- 12))
+  "Plant some seeds on a specific position."
+  [db [_ position]]
+  (let [new-seed (-> db :seed (- config/plant-seed-cost))
         current-plants (-> db :plants)
-        new-plants (let* [head (take-while #(not (nil? %)) current-plants)
-                          tail (drop (+ 1 (count head)) current-plants)]
+        new-plants (let* [head (take position current-plants)
+                          tail (-> position (+ 1) (drop current-plants))]
                      (concat head [config/new-plant] tail))]
     (if (> 0 new-seed)
       db

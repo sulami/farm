@@ -47,16 +47,20 @@
            2 "Autumn"
            3 "Winter"))))
 
-(defn draw-plant [plant]
+(defn draw-plant [plant position]
   (let* [age (-> plant :age)
          color (->> plant :water plant-color (apply cljs->rgb))
          attrs (cond
-                 (nil? plant) {:char "_" :color "brown"}
-                 (< age config/sapling-age) {:char "." :color color}
-                 (< age config/plant-age) {:char "i" :color color}
-                 :else {:char "Y" :color "green"})]
-    [:span
-     {:style {:color (-> attrs :color)}}
+                 (nil? plant) {:char "_" :color "brown" :action [:plant-seeds position]}
+                 (< age config/sapling-age) {:char "." :color color :action []}
+                 (< age config/plant-age) {:char "i" :color color :action []}
+                 :else {:char "Y"
+                        :color "green"
+                        :action [:harvest position]})]
+    [:a
+     {:style {:color (-> attrs :color)}
+      :href "#"
+      :on-click #(-> attrs :action dispatch)}
      (-> attrs :char)]))
 
 (defn resource-block [resource]
@@ -110,5 +114,5 @@
      [:div
       [:p {:style {:font-family "monospace"}}
        (interleave
-        (map draw-plant (-> @state :plants))
+        (map draw-plant (-> @state :plants) (range))
         (repeat " "))]]]))
