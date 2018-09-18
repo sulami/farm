@@ -23,3 +23,4 @@
 
 ; Economy
 (defonce plant-seed-cost 12) ; Seeds / plant
+(defonce food-per-plant 1) ; Gained upon harvesting

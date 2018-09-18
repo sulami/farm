@@ -77,14 +77,17 @@
                       (map #(update-plant-water % weather))
                       (map #(if (plant-alive? % weather temperature) % nil)))))))
 
-;; (defn harvest []
-;;   (swap!
-;;    state
-;;    (fn [current]
-;;      (let* [current-plants (-> current :plants)
-;;             new-plants (filter #(-> % :age (< config/plant-age)) current-plants)
-;;             harvested (- (count current-plants) (count new-plants))
-;;             new-food (-> current :food (+ harvested))]
-;;        (into current
-;;              {:food new-food
-;;               :plants new-plants})))))
+(defn harvest
+  "Harvest a plant in a position adding some food."
+  [db [_ position]]
+  (let* [plants (-> db :plants)
+         plant (nth position plants)
+         head (take position plants)
+         tail (-> position (+ 1) (drop plants))
+         new-plants (concat head [nil] tail)
+         new-food (-> db :food (+ config/food-per-plant))]
+    (if (-> plant :age (< config/plant-age))
+      db
+      (into db
+            {:food new-food
+             :plants new-plants}))))

@@ -3,7 +3,7 @@
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource]]
-            [farm.plant :refer [plant-seeds update-plants water-plants]]
+            [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
             [farm.views :refer [timer]]))
 
@@ -69,9 +69,13 @@
  trade-resource)
 
 (reg-event-db
+ :water-plants
+ water-plants)
+
+(reg-event-db
  :plant-seeds
  plant-seeds)
 
 (reg-event-db
- :water-plants
- water-plants)
+ :harvest
+ harvest)

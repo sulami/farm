@@ -99,14 +99,6 @@
      ;; Actions
      [:div
       [:input {:type "button"
-               :value "Plant 12 seeds"
-               :disabled (or (-> @state :seed (< 12))
-                             (->> @state :plants (filter nil?) empty?))
-               :on-click #(dispatch [:plant-seeds])}]
-      [:input {:type "button"
-               :value "Harvest"
-               :on-click #(dispatch [:step])}]
-      [:input {:type "button"
                :value "Water plants"
                :on-click #(dispatch [:water-plants])}]]
 
