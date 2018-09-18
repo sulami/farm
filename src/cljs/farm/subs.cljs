@@ -5,5 +5,5 @@
 ;; TODO Break this up.
 (reg-sub
  :state
- (fn [db]
+ (fn state-sub [db]
    db))
