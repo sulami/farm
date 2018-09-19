@@ -104,7 +104,7 @@
 
      ;; Field
      [:div
-      [:p {:style {:font-family "monospace"}}
+      [:p {:style {:font-family "monospace" :letter-spacing "-3px"}}
        (interleave
         (map draw-plant (-> @state :plants) (range))
         (repeat " "))]]]))
