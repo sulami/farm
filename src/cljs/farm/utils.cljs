@@ -16,7 +16,9 @@
   [m ks v]
   (update-in m ks (constantly v)))
 
-(defn avg [coll]
+(defn avg
+  "Average the values of coll. Zero if empty."
+  [coll]
   (let [filtered (filter #(-> % nil? not) coll)]
     (if (empty? filtered)
       0
