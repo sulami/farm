@@ -1,6 +1,6 @@
 (ns farm.plant
   (:require [farm.config :as config]
-            [farm.utils :refer [within-bounds]]))
+            [farm.utils :refer [in? within-bounds]]))
 
 (defn plant-seeds
   "Plant some seeds on a specific position."
@@ -32,11 +32,48 @@
                      #(- % 1))
                    (within-bounds 0 config/max-plant-water)))))
 
+; TODO move to utils
+(defn remove-duplicate
+  "Returns a lazy sequence of the elements of coll with duplicates removed using a predicate"
+  [coll pred]
+  (let [step (fn step [xs seen]
+               (lazy-seq
+                ((fn [[f :as xs] seen]
+                   (when-let [s (seq xs)]
+                     (if (some pred seen)
+                       (recur (rest s) seen)
+                       (cons f (step (rest s) (conj seen f))))))
+                 xs seen)))]
+    (step coll #{})))
+
 (defn water-plants
-  "Manually water plants."
+  "Manually water the N plants with the lowest water. N = water-power.
+  XXX This needs some refactoring."
   [db _]
-  (update-in db[:plants]
-             (partial map #(update-plant-water % :manual))))
+  (let* [add-position (fn add-position [plant position]
+                        {:position position
+                         :plant plant})
+         plants (-> db :plants)
+         plants-with-position (map add-position plants (range))
+         positions-to-water (->> plants-with-position
+                                 (filter #(-> % :plant nil? not))
+                                 (sort-by #(-> % :plant :water))
+                                 (take config/water-capacity)
+                                 (map :position))
+         water (fn water [plant]
+                 (if (->> plant
+                          :position
+                          (in? positions-to-water))
+                   (update-in plant
+                              [:plant :water]
+                              (within-bounds #(+ % config/water-amount)
+                                             0
+                                             config/max-plant-water))
+                   plant))]
+    (->> plants-with-position
+         (map water)
+         (map :plant)
+         (assoc db :plants))))
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.

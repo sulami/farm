@@ -1,5 +1,16 @@
 (ns farm.utils)
 
+(defn debug-print
+  "Print a value and return it."
+  [x]
+  (prn x)
+  x)
+
+(defn in?
+  "True if coll contains element."
+  [coll element]
+  (some #(= element %) coll))
+
 (defn set-in
   "Like update in, but just sets."
   [m ks v]

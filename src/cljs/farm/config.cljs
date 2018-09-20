@@ -13,6 +13,10 @@
 (defonce max-plant-water 30)
 (defonce optimal-temperature 19)
 
+; Farming - TODO Make these dynamic and move them to db
+(defonce water-capacity 5) ; How many plants can be watered in one go
+(defonce water-amount 5) ; How much plants get watered per go
+
 ; Colors
 (defonce plant-green [20 160 80])
 (defonce plant-brown [200 150 30])
