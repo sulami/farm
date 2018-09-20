@@ -1,11 +1,29 @@
 (ns farm.events
-  (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
+  (:require [cljs.spec.alpha :as s]
+            [re-frame.core :refer [reg-event-db reg-event-fx after]]
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
             [farm.views :refer [timer]]))
+
+;; Spec Validation
+
+(defn check-and-throw
+  "Throws an exception if `db` doesn't match the Spec `a-spec`."
+  [a-spec db]
+  (when-not (s/valid? a-spec db)
+    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
+
+;; now we create an interceptor using `after`
+(def check-spec-interceptor
+  (after (partial check-and-throw :farm.db/db)))
+
+(def db-spec-interceptors
+  [check-spec-interceptor])
+
+;; Boilerplate
 
 (reg-event-db
  :initialize-db
@@ -16,6 +34,7 @@
 
 (reg-event-fx
  :step
+ db-spec-interceptors
  (fn step-handler [_ _]
    {:dispatch-n
     (list [:inc-game-time]
@@ -28,30 +47,36 @@
 
 (reg-event-db
  :inc-game-time
+ db-spec-interceptors
  (fn inc-game-time-handler [db _]
    (update-in db [:game-time] inc)))
 
 (reg-event-db
  :update-weather
+ db-spec-interceptors
  (fn update-weather-handler [db _]
    (update-in db [:weather] weather)))
 
 (reg-event-db
  :update-temperature
+ db-spec-interceptors
  (fn update-temperature-handler [db _]
    (set-in db [:temperature] (-> db :game-time temperature))))
 
 (reg-event-db
  :consume-food
+ db-spec-interceptors
  consume-food)
 
 (reg-event-db
  :update-prices
+ db-spec-interceptors
  (fn update-prices-handler [db _]
    (set-in db [:food-price] (food-price))))
 
 (reg-event-db
  :update-plants
+ db-spec-interceptors
  update-plants)
 
 (reg-event-fx
@@ -66,16 +91,20 @@
 
 (reg-event-db
  :trade-resource
+ db-spec-interceptors
  trade-resource)
 
 (reg-event-db
  :water-plants
+ db-spec-interceptors
  water-plants)
 
 (reg-event-db
  :plant-seeds
+ db-spec-interceptors
  plant-seeds)
 
 (reg-event-db
  :harvest
+ db-spec-interceptors
  harvest)
