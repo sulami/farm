@@ -1,6 +1,6 @@
 (ns farm.plant
   (:require [farm.config :as config]
-            [farm.utils :refer [in? within-bounds]]))
+            [farm.utils :refer [in? update-when within-bounds]]))
 
 (defn plant-seeds
   "Plant some seeds on a specific position."
@@ -32,20 +32,6 @@
                      #(- % 1))
                    (within-bounds 0 config/max-plant-water)))))
 
-; TODO move to utils
-(defn remove-duplicate
-  "Returns a lazy sequence of the elements of coll with duplicates removed using a predicate"
-  [coll pred]
-  (let [step (fn step [xs seen]
-               (lazy-seq
-                ((fn [[f :as xs] seen]
-                   (when-let [s (seq xs)]
-                     (if (some pred seen)
-                       (recur (rest s) seen)
-                       (cons f (step (rest s) (conj seen f))))))
-                 xs seen)))]
-    (step coll #{})))
-
 (defn water-plants
   "Manually water the N plants with the lowest water. N = water-power.
   XXX This needs some refactoring."
@@ -61,11 +47,8 @@
                                  (take config/water-capacity)
                                  (map :position))
          water (fn water [plant]
-                 (if (->> plant
-                          :position
-                          (in? positions-to-water))
-                   (update-in plant
-                              [:plant :water]
+                 (if (->> plant :position (in? positions-to-water))
+                   (update-in plant [:plant :water]
                               (within-bounds #(+ % config/water-amount)
                                              0
                                              config/max-plant-water))
@@ -89,9 +72,8 @@
                    (* -1)
                    (+ 90)
                    (+ (-> plant :water (quot 3))))]
-      (if (> roll bar)
-        plant
-        (update-in plant [:age] inc)))))
+      (update-when plant (<= roll bar)
+                   #(update-in % [:age] inc)))))
 
 (defn plant-alive?
   "Return plant life status. Plants die if they drie out, or freeze.
@@ -123,8 +105,6 @@
          tail (-> position (+ 1) (drop plants))
          new-plants (concat head [nil] tail)
          new-food (-> db :food (+ config/food-per-plant))]
-    (if (-> plant :age (< config/plant-age))
-      db
-      (into db
-            {:food new-food
-             :plants new-plants}))))
+    (update-when db (-> plant :age (< config/plant-age))
+                 #(into % {:food new-food
+                           :plants new-plants}))))

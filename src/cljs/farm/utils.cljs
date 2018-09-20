@@ -11,6 +11,11 @@
   [coll element]
   (some #(= element %) coll))
 
+(defn update-when
+  "Update value with f if pred, otherwise return value."
+  [value pred f]
+  (if pred (f value) value))
+
 (defn set-in
   "Like update in, but just sets."
   [m ks v]
@@ -32,6 +37,19 @@
         (apply args)
         (max lower)
         (min upper))))
+
+(defn dedup
+  "Returns a lazy sequence of the elements of coll with duplicates removed using a predicate"
+  [coll pred]
+  (let [step (fn step [xs seen]
+               (lazy-seq
+                ((fn [[f :as xs] seen]
+                   (when-let [s (seq xs)]
+                     (if (some pred seen)
+                       (recur (rest s) seen)
+                       (cons f (step (rest s) (conj seen f))))))
+                 xs seen)))]
+    (step coll #{})))
 
 (defn fuzz
   "Fuzz a number within `amount` in either direction."
