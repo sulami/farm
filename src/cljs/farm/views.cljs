@@ -93,7 +93,6 @@
        (resource-block :food)
        [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
        [:tr (format "Weather: %s" (-> @state :weather name str/capitalize))]
-       [:tr (format "Plants %i" (-> @state :plants count))]
        [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]
 
      ;; Actions
