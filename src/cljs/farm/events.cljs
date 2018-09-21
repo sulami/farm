@@ -16,7 +16,6 @@
   (when-not (s/valid? a-spec db)
     (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
 
-;; now we create an interceptor using `after`
 (def check-spec-interceptor
   (after (partial check-and-throw :farm.db/db)))
 
