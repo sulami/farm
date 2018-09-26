@@ -10,7 +10,8 @@
 
   :min-lein-version "2.5.3"
 
-  :source-paths ["src/clj" "src/cljs"]
+  :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["test"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
@@ -38,7 +39,7 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["src/cljs"]
+     :source-paths ["src/cljc"]
      :figwheel     {:on-jsload "farm.core/mount-root"}
      :compiler     {:main                 farm.core
                     :output-to            "resources/public/js/compiled/app.js"
@@ -50,7 +51,7 @@
                     }}
 
     {:id           "min"
-     :source-paths ["src/cljs"]
+     :source-paths ["src/cljc"]
      :compiler     {:main            farm.core
                     :output-to       "resources/public/js/compiled/app.js"
                     :optimizations   :advanced

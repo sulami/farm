@@ -24,10 +24,12 @@
 
 ;; Boilerplate
 
+(defn initialize-db [_ _]
+  db/default-db)
+
 (reg-event-db
  :initialize-db
- (fn initialize-db-handler [_ _]
-   db/default-db))
+ initialize-db)
 
 ;; Iterations
 
