@@ -12,6 +12,18 @@
     (is (= (resource-price-key :foo)
            :foo-price))))
 
+(deftest food-price-test
+  (testing "is within bounds"
+    (let [prices (for [n (range 1000)]
+                   (food-price))
+          lower-bound 2
+          upper-bound 12]
+      (is (= (->> prices
+                  (filter #(or (< % lower-bound)
+                               (< upper-bound %)))
+                  distinct)
+             [])))))
+
 ;; Event Handler Tests
 
 (deftest consume-food-test
