@@ -1,5 +1,6 @@
 (ns farm.events
-  (:require [cljs.spec.alpha :as s]
+  (:require #?(:cljs [cljs.spec.alpha :as s]
+               :clj  [clojure.spec.alpha :as s])
             [re-frame.core :refer [reg-event-db reg-event-fx after]]
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
@@ -84,8 +85,9 @@
  :check-lose
  (fn check-lose-handler [{:keys [db]} _]
    (when (-> db :food (<= 0))
-     (js/clearInterval timer)
-     (js/alert "You starve."))))
+     #?(:cljs (do
+        (js/clearInterval timer)
+        (js/alert "You starve."))))))
 
 
 ;; Interactive

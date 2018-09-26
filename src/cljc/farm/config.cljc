@@ -1,7 +1,7 @@
 (ns farm.config)
 
-(def debug?
-  ^boolean goog.DEBUG)
+#?(:cljs (def debug? ^boolean goog.DEBUG)
+   :clj (def debug? true))
 
 (defonce game-speed 3000) ; Real seconds per game day
 (defonce length-of-year 360) ; Days

@@ -1,7 +1,7 @@
 (ns farm.views
   (:require
    [clojure.string :as str]
-   [reagent.format :refer [format]]
+   #?(:cljs [reagent.format :refer [format]])
    [re-frame.core :as re-frame :refer [dispatch subscribe]]
    [farm.climate :refer [time->season]]
    [farm.config :as config]
@@ -9,8 +9,9 @@
    [farm.subs :as subs]
    [farm.utils :refer [avg]]))
 
-(defonce timer
+#?(:cljs (defonce timer
   (js/setInterval #(dispatch [:step]) config/game-speed))
+   :clj (defonce timer nil))
 
 (defn cljs->rgb
   "Build an RGB(A) color attribute from numbers."

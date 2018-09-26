@@ -1,6 +1,6 @@
 (ns farm.core
   (:require [reagent.core :as reagent :refer [atom]]
-            [reagent.format :refer [format]]
+            #?(:cljs [reagent.format :refer [format]])
             [re-frame.core :as re-frame]
             [clojure.string :as str]
             [farm.events :as events]

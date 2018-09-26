@@ -1,5 +1,6 @@
 (ns farm.db
-  (:require [cljs.spec.alpha :as s]
+  (:require #?(:cljs [cljs.spec.alpha :as s]
+               :clj [clojure.spec.alpha :as s])
             [farm.config :as config]
             [farm.utils :refer [in?]]))
 
