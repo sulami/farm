@@ -21,6 +21,13 @@
   [m ks v]
   (update-in m ks (constantly v)))
 
+(defn insert-at
+  "Inserts elm into coll at idx, overwriting whatever was there before."
+  [elm idx coll]
+  (let* [head (take idx coll)
+         tail (-> idx (+ 1) (drop coll))]
+    (-> tail (into [elm]) (into head))))
+
 (defn avg
   "Average the values of coll. Zero if empty."
   [coll]

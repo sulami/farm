@@ -1,15 +1,13 @@
 (ns farm.plant
   (:require [farm.config :as config]
-            [farm.utils :refer [in? update-when within-bounds]]))
+            [farm.utils :refer [insert-at in? update-when within-bounds]]))
 
 (defn plant-seeds
   "Plant some seeds on a specific position."
   [db [_ position]]
   (let [new-seed (-> db :seed (- config/plant-seed-cost))
         current-plants (-> db :plants)
-        new-plants (let* [head (take position current-plants)
-                          tail (-> position (+ 1) (drop current-plants))]
-                     (concat head [config/new-plant] tail))]
+        new-plants (insert-at config/new-plant position current-plants)]
     (if (> 0 new-seed)
       db
       (into db
@@ -76,7 +74,7 @@
                    #(update-in % [:age] inc)))))
 
 (defn plant-alive?
-  "Return plant life status. Plants die if they drie out, or freeze.
+  "Return plant life status. Plants die if they dry out, or freeze.
   Temperature-based death occurs the further temperature drops below 8 degrees."
   [plant weather temperature]
   (let [freezing-temperature (if (-> plant :age (> config/plant-age))
@@ -100,10 +98,8 @@
   "Harvest a plant in a position adding some food."
   [db [_ position]]
   (let* [plants (-> db :plants)
-         plant (nth position plants)
-         head (take position plants)
-         tail (-> position (+ 1) (drop plants))
-         new-plants (concat head [nil] tail)
+         plant (nth plants position)
+         new-plants (insert-at nil position plants)
          new-food (-> db :food (+ config/food-per-plant))]
     (update-when db (-> plant :age (< config/plant-age))
                  #(into % {:food new-food

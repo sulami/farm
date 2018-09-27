@@ -4,11 +4,11 @@
 
 (defn time->season [game-time]
   (-> game-time
-      (quot 90)
+      (quot (quot config/length-of-year 4))
       (mod 4)))
 
 (defn temperature
-  "Sine wave temperature between 23 and 3 degrees."
+  "Sine wave temperature between 26 and 0 degrees."
   [game-time]
   (-> game-time
       (mod config/length-of-year) ; Day in the year

@@ -3,10 +3,6 @@
             [farm.economy :refer :all]
             [farm.events :refer [initialize-db]]))
 
-(deftest sanity-test
-  (testing "Sanity"
-    (is (= 1 1) "Insanity")))
-
 (deftest resource-price-key-test
   (testing "is appending '-price'"
     (is (= (resource-price-key :foo)
