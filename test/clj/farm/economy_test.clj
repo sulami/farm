@@ -10,15 +10,13 @@
 
 (deftest food-price-test
   (testing "is within bounds"
-    (let [prices (for [n (range 1000)]
-                   (food-price))
+    (let [prices (repeatedly 1000 food-price)
           lower-bound 2
           upper-bound 12]
-      (is (= (->> prices
-                  (filter #(or (< % lower-bound)
-                               (< upper-bound %)))
-                  distinct)
-             [])))))
+      (is (->> prices
+               (some #(or (< % lower-bound)
+                          (< upper-bound %)))
+               nil?)))))
 
 ;; Event Handler Tests
 
@@ -40,18 +38,22 @@
 
     (testing "buying"
       (let [db' (trade-resource db [:trade-resource :buy resource amount])]
+
         (testing "adds the right amount of resource"
           (is (= (-> db' resource (- amount))
                  (-> db resource))))
+
         (testing "deducts the right amount of money"
           (is (= (-> db' :money (+ price))
                  (-> db :money))))))
 
     (testing "selling"
       (let [db' (trade-resource db [:trade-resource :sell resource amount])]
+
         (testing "deducts the right amont of resource"
           (is (= (-> db' resource (+ amount))
                  (-> db resource))))
+
         (testing "adds the right amount of money"
           (is (= (-> db' :money (- price))
                  (-> db :money))))))))
