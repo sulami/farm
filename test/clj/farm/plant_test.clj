@@ -59,7 +59,7 @@
              (->> db'
                   :plants
                   (take config/water-capacity)
-                  (map #(:water %))))))))
+                  (map :water)))))))
 
 (deftest update-plants-water-test
   (let* [db (initialize-db {} [:initialize-db])
