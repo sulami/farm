@@ -7,13 +7,13 @@
   (let [seasons (map time->season (range 1000))]
 
     (testing "is within bounds"
-      (is (= (apply max seasons) 3))
-      (is (= (apply min seasons) 0)))
+      (is (= 3 (apply max seasons)))
+      (is (= 0 (apply min seasons))))
 
     (testing "follows the right sequence"
       (let [deduped-seasons (dedupe seasons)]
-        (is (= deduped-seasons
-               (->> (range 4) cycle (take (count deduped-seasons)))))))))
+        (is (= (->> (range 4) cycle (take (count deduped-seasons)))
+               deduped-seasons))))))
 
 (deftest temperature-test
   (testing "is within bounds"

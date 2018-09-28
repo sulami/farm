@@ -31,7 +31,7 @@
 (defn avg
   "Average the values of coll. Zero if empty."
   [coll]
-  (let [filtered (filter #(-> % nil? not) coll)]
+  (let [filtered (filter some? coll)]
     (if (empty? filtered)
       0
       (/ (reduce + filtered) (count filtered)))))

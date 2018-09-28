@@ -40,7 +40,7 @@
          plants (-> db :plants)
          plants-with-position (map add-position plants (range))
          positions-to-water (->> plants-with-position
-                                 (filter #(-> % :plant nil? not))
+                                 (filter #(-> % :plant some?))
                                  (sort-by #(-> % :plant :water))
                                  (take config/water-capacity)
                                  (map :position))
@@ -77,10 +77,12 @@
   "Return plant life status. Plants die if they dry out, or freeze.
   Temperature-based death occurs the further temperature drops below 8 degrees."
   [plant weather temperature]
-  (let [freezing-temperature (if (-> plant :age (> config/plant-age))
-                               8 0)]
-    (and (-> plant :water (> 0))
-         (-> freezing-temperature rand-int (- temperature) neg?))))
+  (if (nil? plant)
+    nil
+    (let [freezing-temperature (if (-> plant :age (> config/plant-age))
+                                 8 0)]
+      (and (-> plant :water (> 0))
+           (-> freezing-temperature rand-int (- temperature) neg?)))))
 
 (defn update-plants
   "Update all plants."

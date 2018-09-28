@@ -5,18 +5,15 @@
 
 (deftest resource-price-key-test
   (testing "is appending '-price'"
-    (is (= (resource-price-key :foo)
-           :foo-price))))
+    (is (= :foo-price
+           (resource-price-key :foo)))))
 
 (deftest food-price-test
   (testing "is within bounds"
     (let [prices (repeatedly 1000 food-price)
           lower-bound 2
           upper-bound 12]
-      (is (->> prices
-               (some #(or (< % lower-bound)
-                          (< upper-bound %)))
-               nil?)))))
+      (is (every? #(<= lower-bound % upper-bound) prices)))))
 
 ;; Event Handler Tests
 
@@ -26,8 +23,8 @@
            family (-> db :family count)
            event [:consume-food]
            db' (consume-food db event)]
-      (is (= (-> db' :food (+ family))
-             (-> db :food))))))
+      (is (= (-> db :food)
+             (-> db' :food (+ family)))))))
 
 (deftest trade-resource-test
   (let* [db (initialize-db {} [:initialize-db])
@@ -40,20 +37,20 @@
       (let [db' (trade-resource db [:trade-resource :buy resource amount])]
 
         (testing "adds the right amount of resource"
-          (is (= (-> db' resource (- amount))
-                 (-> db resource))))
+          (is (= (-> db resource)
+                 (-> db' resource (- amount)))))
 
         (testing "deducts the right amount of money"
-          (is (= (-> db' :money (+ price))
-                 (-> db :money))))))
+          (is (= (-> db :money)
+                 (-> db' :money (+ price)))))))
 
     (testing "selling"
       (let [db' (trade-resource db [:trade-resource :sell resource amount])]
 
         (testing "deducts the right amont of resource"
-          (is (= (-> db' resource (+ amount))
-                 (-> db resource))))
+          (is (= (-> db resource)
+                 (-> db' resource (+ amount)))))
 
         (testing "adds the right amount of money"
-          (is (= (-> db' :money (- price))
-                 (-> db :money))))))))
+          (is (= (-> db :money)
+                 (-> db' :money (- price)))))))))
