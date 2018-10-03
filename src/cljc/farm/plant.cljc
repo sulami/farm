@@ -6,9 +6,9 @@
   "Plant some seeds on a specific position."
   [db [_ position]]
   (let [new-seed (-> db :seed (- config/plant-seed-cost))
-        current-plants (-> db :plants)
+        current-plants (:plants db)
         new-plants (insert-at config/new-plant position current-plants)]
-    (if (> 0 new-seed)
+    (if (neg? new-seed)
       db
       (into db
             {:seed new-seed
@@ -17,8 +17,7 @@
 (defn update-plant-water
   "Update water on a plant depending on the weather."
   [plant weather]
-  (if (nil? plant)
-    nil
+  (when-not (nil? plant)
     (update-in plant
                [:water]
                (-> (case weather
@@ -27,7 +26,7 @@
                      :rain inc
                      :hail inc
                      :thunderstorm inc
-                     #(- % 1))
+                     dec)
                    (within-bounds 0 config/max-plant-water)))))
 
 (defn water-plants
@@ -37,7 +36,7 @@
   (let* [add-position (fn add-position [plant position]
                         {:position position
                          :plant plant})
-         plants (-> db :plants)
+         plants (:plants db)
          plants-with-position (map add-position plants (range))
          positions-to-water (->> plants-with-position
                                  (filter #(-> % :plant some?))
@@ -61,8 +60,7 @@
   The formula makes the chance of growth `-(temperature - 19)^2 + 90`% each
   step."
   [plant weather temperature]
-  (if (nil? plant)
-    nil
+  (when-not (nil? plant)
     (let* [roll (rand-int 100)
            bar (-> temperature
                    (- config/optimal-temperature)
@@ -77,8 +75,7 @@
   "Return plant life status. Plants die if they dry out, or freeze.
   Temperature-based death occurs the further temperature drops below 8 degrees."
   [plant weather temperature]
-  (if (nil? plant)
-    nil
+  (when-not (nil? plant)
     (let [freezing-temperature (if (-> plant :age (> config/plant-age))
                                  8 0)]
       (and (-> plant :water (> 0))
@@ -87,19 +84,19 @@
 (defn update-plants
   "Update all plants."
   [db _]
-  (let* [weather (-> db :weather)
-         temperature (-> db :temperature)]
+  (let* [weather (:weather db)
+         temperature (:temperature db)]
     (update-in db [:plants]
                (fn [plants]
                  (->> plants
                       (map #(grow-plant % weather temperature))
                       (map #(update-plant-water % weather))
-                      (map #(if (plant-alive? % weather temperature) % nil)))))))
+                      (map #(when (plant-alive? % weather temperature) %)))))))
 
 (defn harvest
   "Harvest a plant in a position adding some food."
   [db [_ position]]
-  (let* [plants (-> db :plants)
+  (let* [plants (:plants db)
          plant (nth plants position)
          new-plants (insert-at nil position plants)
          new-food (-> db :food (+ config/food-per-plant))]
