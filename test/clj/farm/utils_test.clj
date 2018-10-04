@@ -75,3 +75,14 @@
   (testing "doesn't change result within bounds"
     (is (= (+ 3 5)
            ((within-bounds #(+ % 5) 0 10) 3)))))
+
+(deftest fuzz-test
+  (testing "can return all values in range"
+    (let [fuzz-base 10
+          fuzz-range 2
+          expected (range (- fuzz-base fuzz-range) (+ fuzz-base fuzz-range 1))]
+      (is (= expected
+             (->> (repeatedly #(fuzz fuzz-base fuzz-range))
+                  distinct
+                  (take 5)
+                  sort))))))
