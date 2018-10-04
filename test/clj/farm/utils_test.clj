@@ -54,3 +54,11 @@
              l' (insert-at :elm 4 l)]
         (is (= :elm
                (nth l' 4)))))))
+
+(deftest avg-test
+  (testing "min < avg < max"
+    (let [coll (repeatedly 10 #(rand-int 10))]
+      (is (< (apply min coll) (avg coll) (apply max coll)))))
+
+  (testing "empty input"
+    (is (= 0 (avg [])))))
