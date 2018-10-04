@@ -62,3 +62,16 @@
 
   (testing "empty input"
     (is (= 0 (avg [])))))
+
+(deftest within-bounds-test
+  (testing "respects upper bound"
+    (let [upper-bound 10]
+      (is (= upper-bound ((within-bounds #(+ % 5) 0 upper-bound) 8)))))
+
+  (testing "respects lower bound"
+    (let [lower-bound 10]
+      (is (= lower-bound ((within-bounds #(- % 5) lower-bound 10) 3)))))
+
+  (testing "doesn't change result within bounds"
+    (is (= (+ 3 5)
+           ((within-bounds #(+ % 5) 0 10) 3)))))
