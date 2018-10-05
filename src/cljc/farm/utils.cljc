@@ -7,7 +7,8 @@
   x)
 
 (defn in?
-  "True if coll contains element."
+  "True if coll contains element.
+  Contrary to `contains?`, this works for lists."
   [coll element]
   (some #(= element %) coll))
 
