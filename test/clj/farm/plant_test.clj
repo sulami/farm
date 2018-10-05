@@ -2,7 +2,8 @@
   (:require  [clojure.test :refer :all]
              [farm.config :as config]
              [farm.events :refer [initialize-db]]
-             [farm.plant :refer :all]))
+             [farm.plant :refer :all]
+             [farm.utils :refer [insert-at set-in]]))
 
 (deftest plant-seeds-test
   (let* [db (initialize-db {} [:initialize-db])
@@ -61,10 +62,84 @@
                   (take config/water-capacity)
                   (map :water)))))))
 
+(deftest plant-alive?-test
+  (testing "it keeps empty plots"
+    (is (not (plant-alive? nil :clear 10))))
+
+  (testing "it kills plants if they run out of water"
+    (is (-> config/new-plant
+            (set-in [:water] 0)
+            (plant-alive? :clear 10)
+            not)))
+
+  (testing "it kills plants if it's cold"
+    (is (not (plant-alive? config/new-plant :clear 0))))
+
+  (testing "it keeps plants alive if it's warm and they have water"
+    (is (plant-alive? config/new-plant :clear 8))))
+
 (deftest update-plants-water-test
-  (let* [db (initialize-db {} [:initialize-db])
-         db' (-> db
-                 #_(update-plants [:update-plants]))]))
+
+  (testing "with fresh plants it"
+    (let* [db (initialize-db {} [:initialize-db])
+           db' (-> db
+                   (grow-plants-helper 5)
+                   (update-plants [:update-plants]))]
+
+      (testing "doesn't change the field size"
+        (is (= (-> db :plants count)
+               (-> db' :plants count))))
+
+      (testing "it reduces plant water"
+        (is (= (repeat 5 (dec config/max-plant-water))
+               (->> db'
+                    :plants
+                    (map :water)
+                    (take 5)))))
+
+      (testing "it grows plants"
+        (is (->> db'
+                 :plants
+                 (map :age)
+                 (take 5)
+                 (every? #(<= 0 % 1)))))))
+
+  (testing "after many runs it"
+    (let* [db (initialize-db {} [:initialize-db])
+           db' (as-> db input
+                   (grow-plants-helper input 5)
+                   (iterate #(update-plants % [:update-plants]) input)
+                   (nth input 20))]
+
+      (testing "it reduces plant water"
+        (is (= (repeat 5 (- config/max-plant-water 20))
+               (->> db'
+                    :plants
+                    (map :water)
+                    (take 5)))))
+
+      (testing "it grows plants"
+        (is (->> db'
+                 :plants
+                 (map :age)
+                 (take 5)
+                 (every? #(<= 0 % 20)))))))
+
+  (testing "with plants running low on water"
+    (let* [db (initialize-db {} [:initialize-db])
+           low-water-plant (set-in config/new-plant [:water] 1)
+           db' (-> db
+                   (update-in [:plants] #(insert-at low-water-plant 0 %))
+                   (update-plants [:update-plants]))]
+
+      (testing "it doesn't change the field size"
+        (is (= (-> db :plants count)
+               (-> db' :plants count))))
+
+      (testing "it kills the plant"
+        (is (->> db'
+                 :plants
+                 (every? nil?)))))))
 
 (deftest harvest-test
   (let* [db (initialize-db {} [:initialize-db])

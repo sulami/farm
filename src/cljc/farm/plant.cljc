@@ -73,13 +73,14 @@
 
 (defn plant-alive?
   "Return plant life status. Plants die if they dry out, or freeze.
-  Temperature-based death occurs the further temperature drops below 8 degrees."
+  Temperature-based death occurs the further temperature drops below 8 degrees,
+  or below 0 degrees if the plant is fully grown."
   [plant weather temperature]
-  (when-not (nil? plant)
-    (let [freezing-temperature (if (-> plant :age (> config/plant-age))
-                                 8 0)]
-      (and (-> plant :water (> 0))
-           (-> freezing-temperature rand-int (- temperature) neg?)))))
+  (and (some? plant)
+       (let [freezing-temperature (if (-> plant :age (> config/plant-age))
+                                    8 0)]
+         (and (-> plant :water (> 0))
+              (-> freezing-temperature rand-int (- temperature) neg?)))))
 
 (defn update-plants
   "Update all plants."
