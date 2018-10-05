@@ -78,8 +78,7 @@
   (testing "it keeps plants alive if it's warm and they have water"
     (is (plant-alive? config/new-plant :clear 8))))
 
-(deftest update-plants-water-test
-
+(deftest update-plants-test
   (testing "with fresh plants it"
     (let* [db (initialize-db {} [:initialize-db])
            db' (-> db
