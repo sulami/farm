@@ -14,21 +14,6 @@
             {:seed new-seed
              :plants new-plants}))))
 
-(defn update-plant-water
-  "Update water on a plant depending on the weather."
-  [plant weather]
-  (when-not (nil? plant)
-    (update-in plant
-               [:water]
-               (-> (case weather
-                     :manual #(+ % 10)
-                     :sunny #(- % 2)
-                     :rain inc
-                     :hail inc
-                     :thunderstorm inc
-                     dec)
-                   (within-bounds 0 config/max-plant-water)))))
-
 (defn water-plants
   "Manually water the N plants with the lowest water. N = water-power.
   XXX This needs some refactoring."
@@ -54,6 +39,21 @@
          (map water)
          (map :plant)
          (assoc db :plants))))
+
+(defn update-plant-water
+  "Update water on a plant depending on the weather."
+  [plant weather]
+  (when-not (nil? plant)
+    (update-in plant
+               [:water]
+               (-> (case weather
+                     :manual #(+ % 10)
+                     :sunny #(- % 2)
+                     :rain inc
+                     :hail inc
+                     :thunderstorm inc
+                     dec)
+                   (within-bounds 0 config/max-plant-water)))))
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
