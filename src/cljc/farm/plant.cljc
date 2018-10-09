@@ -14,9 +14,15 @@
             {:seed new-seed
              :plants new-plants}))))
 
+(defn water-plant
+  "Water a plant with position."
+  [plant-with-position]
+  (update-in plant-with-position [:plant :water]
+             (within-bounds (partial + config/water-amount)
+                            0 config/max-plant-water)))
+
 (defn water-plants
-  "Manually water the N plants with the lowest water. N = water-power.
-  XXX This needs some refactoring."
+  "Manually water the N plants with the lowest water. N = water-capacity."
   [db _]
   (let* [add-position (fn add-position [plant position]
                         {:position position
@@ -28,15 +34,11 @@
                                  (sort-by #(-> % :plant :water))
                                  (take config/water-capacity)
                                  (map :position))
-         water (fn water [plant]
-                 (if (->> plant :position (in? positions-to-water))
-                   (update-in plant [:plant :water]
-                              (within-bounds #(+ % config/water-amount)
-                                             0
-                                             config/max-plant-water))
-                   plant))]
+         water-fn (fn [plant]
+                    (update-when plant (->> plant :position (in? positions-to-water))
+                                  water-plant))]
     (->> plants-with-position
-         (map water)
+         (map water-fn)
          (map :plant)
          (assoc db :plants))))
 

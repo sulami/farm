@@ -40,10 +40,10 @@
   ;; Sets up 5 plants with -2 and 5 plants with -1 water
   (let* [db (initialize-db {} [:initialize-db])
          db' (-> db
-                 (grow-plants-helper 5)
+                 (grow-plants-helper config/water-capacity)
                  (update-plants [:update-plants])
                  (update-plants [:update-plants])
-                 (grow-plants-helper 5 10)
+                 (grow-plants-helper config/water-capacity (* config/water-capacity 2))
                  (update-plants [:update-plants])
                  (water-plants [:water-plants]))]
 
@@ -52,14 +52,19 @@
              (-> db' :plants count))))
 
     (testing "leaves plants alive"
-      (is (= 10
+      (is (= (* config/water-capacity 2)
              (->> db' :plants (filter some?) count))))
 
-    (testing "waters only the plants with the lowest water"
-      (is (= (repeat config/water-capacity config/max-plant-water)
+    (testing "it increases water only up to the maximum"
+      (is (= config/max-plant-water
+             (->> db' :plants (filter some?) (map :water) (apply max)))))
+
+    (testing "it waters only the plants with the lowest water"
+      (is (= (concat (repeat config/water-capacity config/max-plant-water)
+                     (repeat config/water-capacity (- config/max-plant-water 1)))
              (->> db'
                   :plants
-                  (take config/water-capacity)
+                  (take (* config/water-capacity 2))
                   (map :water)))))))
 
 (deftest plant-alive?-test
