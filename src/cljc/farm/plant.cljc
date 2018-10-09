@@ -101,6 +101,6 @@
          plant (nth plants position)
          new-plants (insert-at nil position plants)
          new-food (-> db :food (+ config/food-per-plant))]
-    (update-when db (-> plant :age (< config/plant-age))
+    (update-when db (-> plant :age (>= config/plant-age))
                  #(into % {:food new-food
                            :plants new-plants}))))

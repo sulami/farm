@@ -141,22 +141,42 @@
                  (every? nil?)))))))
 
 (deftest harvest-test
-  (let* [db (initialize-db {} [:initialize-db])
-         db' (-> db
-                 (grow-plants-helper 2)
-                 (harvest [:harvest 0]))]
+  (let [db (initialize-db {} [:initialize-db])]
 
-    (testing "removes the plant"
-      (is (= (-> db :plants count (- 1))
-             (->> db' :plants (filter nil?) count))))
+    (testing "with a young plant"
+      (let [db (grow-plants-helper db 2)
+            db' (harvest db [:harvest 0])]
 
-    (testing "leaves other plants in place"
-      (is (-> db' :plants (nth 1) some?)))
+        (testing "it doesn't change the field size"
+          (is (= (-> db :plants count)
+                 (-> db' :plants count))))
 
-    (testing "doesn't change the field size"
-      (is (= (-> db :plants count)
-             (-> db' :plants count))))
+        (testing "it doesn't remove the plant"
+          (is (= (->> db :plants (filter nil?) count)
+                 (->> db' :plants (filter nil?) count))))
 
-    (testing "increases food amount"
-      (is (= (-> db :food)
-             (-> db' :food (- config/food-per-plant)))))))
+        (testing "it doesn't increase food amount"
+          (is (= (-> db :food)
+                 (-> db' :food))))))
+
+    (testing "with a mature plant"
+      (let* [mature-plant (set-in config/new-plant [:age] config/plant-age)
+             db (-> db
+                    (grow-plants-helper 2)
+                    (update-in [:plants] #(insert-at mature-plant 3 %)))
+             db' (harvest db [:harvest 3])]
+
+        (testing "it doesn't change the field size"
+          (is (= (-> db :plants count)
+                 (-> db' :plants count))))
+
+        (testing "it removes the plant"
+          (is (= (->> db :plants (filter nil?) count (+ 1))
+                 (->> db' :plants (filter nil?) count))))
+
+        (testing "it leaves other plants in place"
+          (is (-> db' :plants (nth 1) some?)))
+
+        (testing "it increases food amount"
+          (is (= (-> db :food)
+                 (-> db' :food (- config/food-per-plant)))))))))
