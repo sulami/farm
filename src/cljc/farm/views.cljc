@@ -80,7 +80,7 @@
 
 (defn game-page []
   (let [state (subscribe [:state])]
-    [:div #_[:h2 "Medieval Farm"]
+    [:div [:h2 "Farm"]
 
      ;; State
      [:div
