@@ -22,7 +22,8 @@
 (defonce plant-brown [200 150 30])
 
 ; Plant prototype
-(defonce new-plant {:age 0
+(defonce new-plant {:type :wheat
+                    :age 0
                     :water max-plant-water})
 
 ; Economy

@@ -37,7 +37,8 @@
 
 (s/def ::plant
   (s/nilable
-   (s/keys :req-un [::age
+   (s/keys :req-un [::type
+                    ::age
                     ::water])))
 
 (s/def ::plants
