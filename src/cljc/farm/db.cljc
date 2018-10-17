@@ -41,7 +41,9 @@
                     ::water])))
 
 (s/def ::plants
-  (s/coll-of ::plant))
+  (s/coll-of ::plant
+             :into []
+             :count config/field-size))
 
 (s/def ::db
   (s/keys :req-un [::game-time
