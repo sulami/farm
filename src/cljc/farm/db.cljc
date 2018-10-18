@@ -10,6 +10,14 @@
 (s/def ::game-time
   (s/and int? #(>= % 0)))
 
+(s/def ::happening
+  (s/keys :req-un [::time
+                   ::event]))
+
+(s/def ::happenings
+  (s/coll-of ::happening
+             ::into []))
+
 (s/def ::age
   (s/and int? #(>= % 0)))
 
@@ -48,6 +56,7 @@
 
 (s/def ::db
   (s/keys :req-un [::game-time
+                   ::happenings
                    ::family
                    ::money
                    ::seed
@@ -62,6 +71,7 @@
 
 (def default-db
   {:game-time 0
+   :happenings config/happenings
    :family [{:name "You"
              :age 20}
             {:name "Your wife"

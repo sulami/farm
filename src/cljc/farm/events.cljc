@@ -5,6 +5,7 @@
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource]]
+            [farm.happenings :refer [fire-happenings-handler]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
             [farm.views :refer [timer]]))
@@ -45,6 +46,7 @@
           [:consume-food]
           [:update-prices]
           [:update-plants]
+          [:fire-happenings]
           [:check-lose])}))
 
 (reg-event-db
@@ -82,13 +84,16 @@
  update-plants)
 
 (reg-event-fx
+ :fire-happenings
+ fire-happenings-handler)
+
+(reg-event-fx
  :check-lose
  (fn check-lose-handler [{:keys [db]} _]
    (when (-> db :food (<= 0))
      #?(:cljs (do
         (js/clearInterval timer)
         (js/alert "You starve."))))))
-
 
 ;; Interactive
 
