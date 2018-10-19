@@ -18,6 +18,10 @@
   (s/coll-of ::happening
              ::into []))
 
+(s/def ::messages
+  (s/coll-of string?
+             ::into []))
+
 (s/def ::age
   (s/and int? #(>= % 0)))
 
@@ -57,6 +61,7 @@
 (s/def ::db
   (s/keys :req-un [::game-time
                    ::happenings
+                   ::messages
                    ::family
                    ::money
                    ::seed
@@ -72,6 +77,9 @@
 (def default-db
   {:game-time 0
    :happenings config/happenings
+   :messages ["Today is a wonderful day."
+              "Let's plant some seeds."
+              "Dont' starve."]
    :family [{:name "You"
              :age 20}
             {:name "Your wife"

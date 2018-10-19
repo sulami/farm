@@ -83,6 +83,11 @@
   (let [state (subscribe [:state])]
     [:div [:h2 "Farm"]
 
+     [:div
+      (map #(into [:p {:style {:margin "0" :color %2}} %1])
+           (->> @state :messages (take 3))
+           ["black" "darkgrey" "lightgrey"])]
+
      ;; State
      [:div
       [:p (-> @state :game-time format-date)]
