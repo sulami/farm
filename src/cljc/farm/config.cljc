@@ -28,7 +28,7 @@
 
 ; Economy
 (defonce plant-seed-cost 12) ; Seeds / plant
-(defonce food-per-plant 1) ; Gained upon harvesting
+(defonce food-per-plant 18) ; Gained upon harvesting
 
 ; Happenings
 (defonce happenings [{:time 100
