@@ -4,7 +4,6 @@
             [farm.config :as config]
             [farm.utils :refer [in?]]))
 
-
 ;; Specs
 
 (s/def ::game-time
@@ -81,8 +80,6 @@
                "Let's plant some seeds."
                "Dont' starve.")
    :family [{:name "You"
-             :age 20}
-            {:name "Your wife"
              :age 18}]
 
    ;; Resources
