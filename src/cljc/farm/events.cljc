@@ -116,3 +116,11 @@
  :harvest
  db-spec-interceptors
  harvest)
+
+;; On demand
+
+(reg-event-db
+ :send-message
+ db-spec-interceptors
+ (fn send-message-handler [db [_ message]]
+   (update-in db [:messages] #(conj % message))))
