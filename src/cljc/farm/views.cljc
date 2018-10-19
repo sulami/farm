@@ -59,10 +59,11 @@
                         :color "green"
                         :action [:harvest position]})]
     [:a
-     {:style {:color (-> attrs :color)}
-      :href "#"
-      :on-click #(-> attrs :action dispatch)}
-     (-> attrs :char)]))
+     [:div
+      {:style {:color (-> attrs :color)}
+       :href "#"
+       :on-click #(-> attrs :action dispatch)}
+      (-> attrs :char)]]))
 
 (defn resource-block [resource]
   (let [state (subscribe [:state])
@@ -104,7 +105,10 @@
 
      ;; Field
      [:div
-      [:p {:style {:font-family "monospace" :letter-spacing "-3px"}}
+      [:p {:style {:display "flex"
+                   :flex-wrap "wrap"
+                   :font-family "monospace"
+                   :font-size "20px"}}
        (interleave
         (map draw-plant (-> @state :plants) (range))
         (repeat " "))]]]))
