@@ -27,7 +27,8 @@
   {:dev
    {:dependencies [[cider/piggieback "0.3.8"]
                    [figwheel-sidecar "0.5.16"]
-                   [binaryage/devtools "0.9.10"]]
+                   [binaryage/devtools "0.9.10"]
+                   [org.clojure/test.check "0.9.0"]]
     :plugins      [[lein-figwheel "0.5.16"]]}
    :prod { }
    }

@@ -9,8 +9,12 @@
 (s/def ::game-time
   (s/and int? #(>= % 0)))
 
+(s/def ::event
+  (s/coll-of keyword?
+             ::into []))
+
 (s/def ::happening
-  (s/keys :req-un [::time
+  (s/keys :req-un [::game-time
                    ::event]))
 
 (s/def ::happenings
@@ -20,6 +24,8 @@
 (s/def ::messages
   (s/coll-of string?
              ::into '()))
+
+(s/def ::name string?)
 
 (s/def ::age
   (s/and int? #(>= % 0)))
@@ -39,12 +45,15 @@
 (s/def ::temperature float?)
 
 (s/def ::weather
-  #(in? [:sunny
-         :clear
-         :overcast
-         :rain
-         :hail
-         :thunderstorm] %))
+  #{:sunny
+    :clear
+    :overcast
+    :rain
+    :hail
+    :thunderstorm})
+
+(s/def ::type keyword?)
+(s/def ::water int?)
 
 (s/def ::plant
   (s/nilable
