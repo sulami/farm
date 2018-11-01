@@ -1,6 +1,5 @@
 (ns farm.events
-  (:require #?(:cljs [cljs.spec.alpha :as s]
-               :clj  [clojure.spec.alpha :as s])
+  (:require [clojure.spec.alpha :as s]
             #?(:cljs [reagent.format :refer [format]])
             [re-frame.core :refer [->interceptor after reg-event-db reg-event-fx]]
             [farm.db :as db]
