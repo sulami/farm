@@ -106,7 +106,7 @@
      [:div
       [:input {:type "button"
                :value "Water plants"
-               :on-click #(dispatch [:water-plants])}]]
+               :on-click #(dispatch [:delayed-action 1000 [:water-plants]])}]]
 
      ;; Field
      [:div

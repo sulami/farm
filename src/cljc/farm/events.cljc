@@ -1,7 +1,8 @@
 (ns farm.events
   (:require #?(:cljs [cljs.spec.alpha :as s]
                :clj  [clojure.spec.alpha :as s])
-            [re-frame.core :refer [reg-event-db reg-event-fx after]]
+            #?(:cljs [reagent.format :refer [format]])
+            [re-frame.core :refer [->interceptor after reg-event-db reg-event-fx]]
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource]]
@@ -97,6 +98,29 @@
 
 ;; Interactive
 
+(def delayed-action-interceptor
+  (->interceptor
+   :id :delayed-action
+   :before (fn [context]
+             ; TODO pop event and delay it
+             )
+   :after (fn [context]
+            (prn context)
+            context)))
+
+(reg-event-fx
+ :delayed-action
+ (fn delayed-action-handler
+   [{:keys [db]} [_ delay action]]
+   {:db (update-in db [:state] (constantly (format "%s (%i)" (first action) delay )))
+    :dispatch-later [{:ms delay :dispatch [:finish-action action]}]}))
+
+(reg-event-fx
+ :finish-action
+ (fn finish-action-handler [{:keys [db]} [_ action]]
+   {:db (update-in db [:state] (constantly :nothing))
+    :dispatch action}))
+
 (reg-event-db
  :trade-resource
  db-spec-interceptors
@@ -104,7 +128,7 @@
 
 (reg-event-db
  :water-plants
- db-spec-interceptors
+ (conj [db-spec-interceptors] delayed-action-interceptor)
  water-plants)
 
 (reg-event-db
