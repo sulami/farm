@@ -31,5 +31,5 @@
 (defonce food-per-plant 18) ; Gained upon harvesting
 
 ; Happenings
-(defonce happenings [{:time 100
+(defonce happenings [{:game-time 100
                       :event [:dummy]}])
