@@ -14,7 +14,7 @@
   (testing "it fires an event at the time of the first happening"
     (let [happening (first config/happenings)
           db (-> (initialize-db {} [:initialize-db])
-                 (update-in [:game-time] #(+ % (:time happening))))]
+                 (update-in [:game-time] #(+ % (:game-time happening))))]
       (is (= [happening]
              (-> (fire-happenings-handler {:db db} [:fire-happenings])
                  :dispatch-n))))))
