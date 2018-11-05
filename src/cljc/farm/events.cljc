@@ -97,17 +97,12 @@
 
 ;; Interactive
 
-(def delayed-action-interceptor
-  (->interceptor
-   :id :delayed-action
-   :before (fn [context]
-             ; TODO pop event and delay it
-             )
-   :after (fn [context]
-            (prn context)
-            context)))
-
+;; Deleady actions work like this:
+;; You dispatch `[:delayed-action <time> <event>]`
+;; The delayed action handler triggers the animation and schedules the actual
+;; triggered without a delay.
 (reg-event-fx
+;; action to happen afterwards. For simple testing, the actions can still be
  :delayed-action
  (fn delayed-action-handler
    [{:keys [db]} [_ delay action]]
@@ -127,7 +122,7 @@
 
 (reg-event-db
  :water-plants
- (conj [db-spec-interceptors] delayed-action-interceptor)
+ db-spec-interceptors
  water-plants)
 
 (reg-event-db
