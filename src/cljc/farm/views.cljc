@@ -83,10 +83,33 @@
   (let [state (subscribe [:state])]
     [:div [:h2 "Farm"]
 
+     ;; XXX Somehow need to get some CSS in there.
+     [:div
+      {:dangerouslySetInnerHTML
+       {:__html "<style>@keyframes bar {from {width: 0%} to {width: 100%}}</style>"}}]
+
      [:div
       (map #(into [:p {:style {:margin "0" :color %2}} %1])
            (->> @state :messages (take 3))
            ["black" "darkgrey" "lightgrey"])]
+
+     ;; XXX Clean all of this up.
+     [:div
+      (format "Activity: %s" (:state @state))
+      (when (not= :nothing (-> @state :state first))
+        [:div {:style {:background-color "lightgrey"
+                       :height "10px"
+                       :width "300px"}}
+         [:div {:style {:animation (if (not= :nothing (-> @state :state first))
+                                     (format "bar %fs infinite"
+                                             (-> @state
+                                                 :state
+                                                 second
+                                                 (/ 1000)))
+                                     "none")
+                        :background-color "blue"
+                        :height "8px"
+                        :width "25%"}}]])]
 
      ;; State
      [:div
@@ -108,7 +131,7 @@
      [:div
       [:input {:type "button"
                :value "Water plants"
-               :on-click #(dispatch [:delayed-action 1000 [:water-plants]])}]]
+               :on-click #(dispatch [:delayed-action 1500 [:water-plants]])}]]
 
      ;; Field
      [:div

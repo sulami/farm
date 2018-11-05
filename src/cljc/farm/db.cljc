@@ -87,6 +87,7 @@
    :messages '("Today is a wonderful day."
                "Let's plant some seeds."
                "Dont' starve.")
+   :state [:nothing 0]
    :family [{:name "You"
              :age 18}]
 
