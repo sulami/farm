@@ -92,16 +92,17 @@
      [:div
       [:p (-> @state :game-time format-date)]
       [:table
-       [:tr (str "Family: " (->> @state :family
-                                 (map format-person)
-                                 (str/join ", ")))]
-       [:tr (format "Money: %ip" (-> @state :money))]
-       (resource-block :seed)
-       (resource-block :food)
-       [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
-       [:tr (format "Weather: %s" @(subscribe [:weather]))]
-       ;; XXX for debugging purposes only
-       [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]
+       [:tbody
+        [:tr (str "Family: " (->> @state :family
+                                  (map format-person)
+                                  (str/join ", ")))]
+        [:tr (format "Money: %ip" (-> @state :money))]
+        (resource-block :seed)
+        (resource-block :food)
+        [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
+        [:tr (format "Weather: %s" @(subscribe [:weather]))]
+        ;; XXX for debugging purposes only
+        [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]]
 
      ;; Actions
      [:div
@@ -111,10 +112,10 @@
 
      ;; Field
      [:div
-      [:p {:style {:display "flex"
-                   :flex-wrap "wrap"
-                   :font-family "monospace"
-                   :font-size "20px"}}
-       (interleave
-        (map draw-plant (-> @state :plants) (range))
-        (repeat " "))]]]))
+      {:style {:display "flex"
+               :flex-wrap "wrap"
+               :font-family "monospace"
+               :font-size "20px"}}
+      (interleave
+       (map draw-plant (-> @state :plants) (range))
+       (repeat " "))]]))
