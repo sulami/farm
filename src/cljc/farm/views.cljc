@@ -95,21 +95,19 @@
 
      ;; XXX Clean all of this up.
      [:div
-      (format "Activity: %s" (:state @state))
-      (when (not= :nothing (-> @state :state first))
-        [:div {:style {:background-color "lightgrey"
-                       :height "10px"
-                       :width "300px"}}
-         [:div {:style {:animation (if (not= :nothing (-> @state :state first))
-                                     (format "bar %fs infinite"
-                                             (-> @state
-                                                 :state
-                                                 second
-                                                 (/ 1000)))
-                                     "none")
-                        :background-color "blue"
-                        :height "8px"
-                        :width "25%"}}]])]
+      (format "Activity: %s" @(subscribe [:current-activity-name]))
+      (let [active (subscribe [:active])]
+        (when @active
+          [:div {:style {:background-color "lightgrey"
+                         :height "10px"
+                         :width "300px"}}
+           [:div {:style {:animation (if @active
+                                       (format "bar %fs infinite"
+                                               @(subscribe [:current-activity-time]))
+                                       "none")
+                          :background-color "blue"
+                          :height "8px"
+                          :width "0%"}}]]))]
 
      ;; State
      [:div

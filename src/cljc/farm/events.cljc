@@ -107,14 +107,14 @@
  (fn delayed-action-handler
    [{:keys [db]} [_ delay action]]
    {:db (update-in db
-                   [:state]
+                   [:activity]
                    (constantly [action delay]))
     :dispatch-later [{:ms delay :dispatch [:finish-action action]}]}))
 
 (reg-event-fx
  :finish-action
  (fn finish-action-handler [{:keys [db]} [_ action]]
-   {:db (update-in db [:state] (constantly [:nothing 0]))
+   {:db (update-in db [:activity] (constantly [[:nothing] 0]))
     :dispatch action}))
 
 (reg-event-db
