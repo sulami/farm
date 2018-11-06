@@ -22,6 +22,39 @@
    "Autumn"
    "Winter"])
 
+; Weather
+(defonce weathers
+  [{:name "Clear"
+    :probability 8
+    :temperature-mod 1
+    :water-mod 0
+    :survival-mod 0}
+   {:name "Overcast"
+    :probability 8
+    :temperature-mod 0
+    :water-mod 0
+    :survival-mod 0}
+   {:name "Sunny"
+    :probability 8
+    :temperature-mod 3
+    :water-mod -1
+    :survival-mod 0}
+   {:name "Rain"
+    :probability 8
+    :temperature-mod -2
+    :water-mod 5
+    :survival-mod -5}
+   {:name "Hail"
+    :probability 1
+    :temperature-mod -3
+    :water-mod 3
+    :survival-mod -15}
+   {:name "Thunderstorm"
+    :probability 1
+    :temperature-mod -1
+    :water-mod 4
+    :survival-mod -10}])
+
 ; Plant information
 (defonce sapling-age 73) ; Steps
 (defonce plant-age 146) ; Steps

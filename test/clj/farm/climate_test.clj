@@ -25,13 +25,8 @@
 
 (deftest weather-test
   (testing "is always a weather symbol"
-    (let [weathers (take 1000 (iterate weather :clear))
-          valid-weathers [:sunny
-                          :clear
-                          :overcast
-                          :rain
-                          :hail
-                          :thunderstorm]]
+    (let [weathers (take 1000 (iterate weather (first config/weathers)))
+          valid-weathers config/weathers]
       (is (->> weathers
                (some (partial contains? valid-weathers))
                nil?)))))

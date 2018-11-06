@@ -4,6 +4,7 @@
             [farm.utils :refer [in?]]))
 
 ;; Specs
+;; TODO These need proper naming and namespacing.
 
 (s/def ::positive-int
   (s/and int? #(>= % 0)))
@@ -49,13 +50,17 @@
 (s/def ::food-price int?)
 (s/def ::temperature float?)
 
+(s/def ::probability int?)
+(s/def ::temperature-mod int?)
+(s/def ::water-mod int?)
+(s/def ::survival-mod int?)
+
 (s/def ::weather
-  #{:sunny
-    :clear
-    :overcast
-    :rain
-    :hail
-    :thunderstorm})
+  (s/keys :req-un [::name
+                   ::probability
+                   ::temperature-mod
+                   ::water-mod
+                   ::survival-mod]))
 
 (s/def ::type keyword?)
 (s/def ::water int?)
@@ -107,5 +112,5 @@
 
    ;; Farming
    :temperature 10
-   :weather :clear
+   :weather (first config/weathers)
    :plants (repeat config/field-size nil)})

@@ -70,7 +70,7 @@
  (fn weather-sub [db _]
    (-> db
        :weather
-       name
+       :name
        str/capitalize)))
 
 ;; ACTIVITY

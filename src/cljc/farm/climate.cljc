@@ -26,10 +26,8 @@
   It's more likely to stay unchanged than to change, and there are certain
   probabilities for each different weather. Random beyond that."
   [current]
-  (rand-nth (concat (repeat 100 current)
-                    (repeat 8 :sunny)
-                    (repeat 8 :clear)
-                    (repeat 8 :overcast)
-                    (repeat 8 :rain)
-                    (repeat 1 :hail)
-                    (repeat 1 :thunderstorm))))
+  (let [weathers (->> config/weathers
+                      (map #(repeat (:probability %) %))
+                      (apply concat))]
+    (rand-nth (concat (repeat 100 current)
+                      weathers))))
