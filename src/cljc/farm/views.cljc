@@ -81,27 +81,31 @@
 
 (defn game-page []
   (let [state (subscribe [:state])]
-    [:div [:h2 "Farm"]
+    [:div
 
+     [:h2 {:class "text-center py-4"}
+      "Farm"]
+
+     ;; Activity
+     [:div
+      (let [active (subscribe [:active])]
+        [:div {:class "w-full text-center"}
+         (format "Activity: %s" @(subscribe [:current-activity-name]))
+         [:div {:class "bg-grey-lighter w-full rounded"
+                :style {:height "8px"}}
+          (when @active
+            [:div {:class "bg-grey-darkest rounded h-full"
+                   :style {:animation (if @active
+                                        (format "bar %fs infinite"
+                                                @(subscribe [:current-activity-time]))
+                                        "none")}}])]])]
+
+     ;; Messages
      [:div
       (map #(into [:p {:style {:margin "0" :color %2}} %1])
            (->> @state :messages (take 3))
            ["black" "darkgrey" "lightgrey"])]
 
-     [:div
-      (format "Activity: %s" @(subscribe [:current-activity-name]))
-      (let [active (subscribe [:active])]
-        (when @active
-          [:div {:style {:background-color "lightgrey"
-                         :height "10px"
-                         :width "300px"}}
-           [:div {:style {:animation (if @active
-                                       (format "bar %fs infinite"
-                                               @(subscribe [:current-activity-time]))
-                                       "none")
-                          :background-color "blue"
-                          :height "8px"
-                          :width "0%"}}]]))]
 
      ;; State
      [:div
@@ -122,6 +126,7 @@
      ;; Actions
      [:div
       [:input {:type "button"
+               :class "rounded bg-grey-darker hover:bg-grey-dark text-white px-2 py-1"
                :value "Water plants"
                :on-click #(dispatch [:delayed-action 1500 [:water-plants]])}]]
 
