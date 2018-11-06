@@ -10,6 +10,13 @@
  (fn state-sub [db _]
    db))
 
+;; MESSAGES
+
+(reg-sub
+ :messages
+ (fn messages-sub [db _]
+   (->> db :messages (take 3))))
+
 ;; TIME
 
 (reg-sub

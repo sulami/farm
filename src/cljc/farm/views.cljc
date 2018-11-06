@@ -88,10 +88,9 @@
 
      ;; Messages
      [:div
-      (map #(into [:p {:style {:margin "0" :color %2}} %1])
-           (->> @state :messages (take 3))
-           ["black" "darkgrey" "lightgrey"])]
-
+      (map #(into [:p {:class (format "m-0 text-%s" %2)} %1])
+           @(subscribe [:messages])
+           ["black" "grey-dark" "grey-light"])]
 
      ;; State
      [:div
