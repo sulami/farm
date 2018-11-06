@@ -83,17 +83,11 @@
   (let [state (subscribe [:state])]
     [:div [:h2 "Farm"]
 
-     ;; XXX Somehow need to get some CSS in there.
-     [:div
-      {:dangerouslySetInnerHTML
-       {:__html "<style>@keyframes bar {from {width: 0%} to {width: 100%}}</style>"}}]
-
      [:div
       (map #(into [:p {:style {:margin "0" :color %2}} %1])
            (->> @state :messages (take 3))
            ["black" "darkgrey" "lightgrey"])]
 
-     ;; XXX Clean all of this up.
      [:div
       (format "Activity: %s" @(subscribe [:current-activity-name]))
       (let [active (subscribe [:active])]

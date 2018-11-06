@@ -32,3 +32,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+@keyframes bar {
+    from { width: 0% }
+    to { width: 100% }
+}
