@@ -6,13 +6,9 @@
 (deftest time->season-test
   (let [seasons (map time->season (range 1000))]
 
-    (testing "is within bounds"
-      (is (= 3 (apply max seasons)))
-      (is (= 0 (apply min seasons))))
-
     (testing "follows the right sequence"
       (let [deduped-seasons (dedupe seasons)]
-        (is (= (->> (range 4) cycle (take (count deduped-seasons)))
+        (is (= (->> config/seasons cycle (take (count deduped-seasons)))
                deduped-seasons))))))
 
 (deftest temperature-test

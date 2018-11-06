@@ -3,9 +3,11 @@
             [farm.utils :refer [fuzz]]))
 
 (defn time->season [game-time]
-  (-> game-time
-      (quot (quot config/length-of-year 4))
-      (mod 4)))
+  (nth
+   config/seasons
+   (-> game-time
+       (quot (quot config/length-of-year 4))
+       (mod 4))))
 
 (defn temperature
   "Sine wave temperature between 26 and 0 degrees."

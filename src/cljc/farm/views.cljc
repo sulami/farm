@@ -34,20 +34,6 @@
           (:name person)
           (:age person)))
 
-(defn format-date [game-time]
-  (let* [year (+ 1 (quot game-time config/length-of-year))
-         day (+ 1 (mod game-time config/length-of-year))
-         season (time->season game-time)]
-    (str "Year " year
-         " / "
-         "Day " day
-         " / "
-         (case season
-           0 "Spring"
-           1 "Summer"
-           2 "Autumn"
-           3 "Winter"))))
-
 (defn draw-plant [plant position]
   (let* [age (-> plant :age)
          color (->> plant :water plant-color (apply cljs->rgb))
@@ -109,8 +95,7 @@
 
      ;; State
      [:div
-      [:p (-> @state :game-time format-date)]
-      [:p @(subscribe [:day-of-the-week])]
+      [:p @(subscribe [:formatted-date])]
       [:table
        [:tbody
         [:tr (str "Family: " (->> @state :family

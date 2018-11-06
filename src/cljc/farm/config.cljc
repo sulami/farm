@@ -7,6 +7,21 @@
 (defonce length-of-year 360) ; Days
 (defonce field-size 300)
 
+; Time
+(defonce days-of-the-week
+  ["Monday"
+   "Tuesday"
+   "Wednesday"
+   "Thursday"
+   "Friday"
+   "Saturday"
+   "Sunday"])
+(defonce seasons
+  ["Spring"
+   "Summer"
+   "Autumn"
+   "Winter"])
+
 ; Plant information
 (defonce sapling-age 73) ; Steps
 (defonce plant-age 146) ; Steps

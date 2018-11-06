@@ -1,12 +1,16 @@
 (ns farm.subs
   (:require [re-frame.core :as re-frame :refer [reg-sub subscribe]]
-            [clojure.string :as str]))
+            #?(:cljs [reagent.format :refer [format]])
+            [clojure.string :as str]
+            [farm.config :as config]
+            [farm.climate :refer [time->season]]))
 
-;; TODO Break this up.
 (reg-sub
  :state
  (fn state-sub [db _]
    db))
+
+;; TIME
 
 (reg-sub
  :game-time
@@ -14,17 +18,45 @@
    (:game-time db)))
 
 (reg-sub
+ :year
+ :<- [:game-time]
+ (fn year-sub [game-time _]
+   (-> game-time
+       (quot config/length-of-year)
+       (+ 1))))
+
+(reg-sub
+ :day
+ :<- [:game-time]
+ (fn day-sub [game-time _]
+   (-> game-time
+       (mod config/length-of-year)
+       (+ 1))))
+
+(reg-sub
  :day-of-the-week
  :<- [:game-time]
  (fn day-of-the-week-sub [game-time _]
-   (nth ["Monday"
-         "Tuesday"
-         "Wednesday"
-         "Thursday"
-         "Friday"
-         "Saturday"
-         "Sunday"]
+   (nth config/days-of-the-week
         (mod game-time 7))))
+
+(reg-sub
+ :season
+ :<- [:game-time]
+ (fn season-sub [game-time _]
+   (time->season game-time)))
+
+(reg-sub
+ :formatted-date
+ :<- [:day-of-the-week]
+ :<- [:day]
+ :<- [:year]
+ :<- [:season]
+ (fn formatted-date-sub [[dow day year season] _]
+   (format "%s, Day %i of Year %i (%s)"
+           dow day year season)))
+
+;; WEATHER
 
 (reg-sub
  :weather
@@ -33,6 +65,8 @@
        :weather
        name
        str/capitalize)))
+
+;; ACTIVITY
 
 (reg-sub
  :current-activity
