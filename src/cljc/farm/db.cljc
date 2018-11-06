@@ -5,8 +5,11 @@
 
 ;; Specs
 
-(s/def ::game-time
+(s/def ::positive-int
   (s/and int? #(>= % 0)))
+
+(s/def ::game-time
+  ::positive-int)
 
 (s/def ::event
   (s/coll-of keyword?
@@ -24,10 +27,13 @@
   (s/coll-of string?
              ::into '()))
 
+(s/def ::activity
+  (s/tuple ::event ::positive-int))
+
 (s/def ::name string?)
 
 (s/def ::age
-  (s/and int? #(>= % 0)))
+  ::positive-int)
 
 (s/def ::family-member
   (s/keys :req-un [::name
@@ -69,6 +75,7 @@
   (s/keys :req-un [::game-time
                    ::happenings
                    ::messages
+                   ::activity
                    ::family
                    ::money
                    ::seed
