@@ -110,6 +110,7 @@
      ;; State
      [:div
       [:p (-> @state :game-time format-date)]
+      [:p @(subscribe [:day-of-the-week])]
       [:table
        [:tbody
         [:tr (str "Family: " (->> @state :family
