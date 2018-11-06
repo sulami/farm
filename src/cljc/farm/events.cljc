@@ -65,7 +65,10 @@
  :update-temperature
  db-spec-interceptors
  (fn update-temperature-handler [db _]
-   (set-in db [:temperature] (-> db :game-time temperature))))
+   (set-in db [:temperature]
+           (-> db
+               :game-time
+               (temperature (:weather db))))))
 
 (reg-event-db
  :consume-food

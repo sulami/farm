@@ -11,15 +11,15 @@
 
 (defn temperature
   "Sine wave temperature between 26 and 0 degrees."
-  [game-time]
+  [game-time weather]
   (-> game-time
-      (mod config/length-of-year) ; Day in the year
-      (/ config/length-of-year) ; %age of the year
+      (mod config/length-of-year)
+      (/ config/length-of-year)
       (* 2 Math/PI)
       Math/sin
-      (* 10) ; Modifier
+      (* 10)
       (+ 13)
-      (fuzz 3))) ; Baseline
+      (+ (:temperature-mod weather))))
 
 (defn weather
   "Update the weather, based on the current weather.
