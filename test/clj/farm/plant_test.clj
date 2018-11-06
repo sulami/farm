@@ -5,6 +5,8 @@
              [farm.plant :refer :all]
              [farm.utils :refer [insert-at set-in]]))
 
+(def default-weather (first config/weathers))
+
 (deftest plant-seeds-test
   (let* [db (initialize-db {} [:initialize-db])
          position 5
@@ -36,7 +38,7 @@
   ([db end]
    (grow-plants-helper db 0 end)))
 
-(deftest water-plant-water-test
+(deftest water-plants-test
   ;; Sets up 5 plants with -2 and 5 plants with -1 water
   (let* [db (initialize-db {} [:initialize-db])
          db' (-> db
@@ -69,19 +71,22 @@
 
 (deftest plant-alive?-test
   (testing "it keeps empty plots"
-    (is (not (plant-alive? nil :clear 10))))
+    (is (not (plant-alive? nil default-weather 10))))
 
   (testing "it kills plants if they run out of water"
     (is (-> config/new-plant
             (set-in [:water] 0)
-            (plant-alive? :clear 10)
+            (plant-alive? default-weather 10)
             not)))
 
   (testing "it kills plants if it's cold"
-    (is (not (plant-alive? config/new-plant :clear 0))))
+    (is (not (plant-alive? config/new-plant default-weather 0))))
+
+  (testing "it kills plants if the weather is bad"
+    (is (not (plant-alive? config/new-plant {:survival-mod -100} 10))))
 
   (testing "it keeps plants alive if it's warm and they have water"
-    (is (plant-alive? config/new-plant :clear 8))))
+    (is (plant-alive? config/new-plant default-weather 8))))
 
 (deftest update-plants-test
   (testing "with fresh plants it"
