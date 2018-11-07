@@ -6,4 +6,5 @@
     {:dispatch-n
      (->> db
           :happenings
-          (filter #(= (:game-time %) now)))}))
+          (filter #(= (:game-time %) now))
+          (map :event))}))
