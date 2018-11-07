@@ -13,8 +13,8 @@
   ::positive-int)
 
 (s/def ::event
-  (s/coll-of keyword?
-             ::into []))
+  (s/and vector?
+         #(-> % first keyword?)))
 
 (s/def ::happening
   (s/keys :req-un [::game-time

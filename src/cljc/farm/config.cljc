@@ -79,5 +79,7 @@
 (defonce food-per-plant 18) ; Gained upon harvesting
 
 ; Happenings
-(defonce happenings [{:game-time 100
-                      :event [:dummy]}])
+(defonce happenings [{:game-time 7
+                      :event [:send-message "You survived one week. Congratulations!"]}
+                     {:game-time 360
+                      :event [:send-message "It's a new year."]}])

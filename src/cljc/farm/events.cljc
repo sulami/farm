@@ -6,6 +6,7 @@
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource]]
             [farm.happenings :refer [fire-happenings-handler]]
+            [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
             [farm.views :refer [timer]]))
@@ -97,6 +98,14 @@
      #?(:cljs (do
         (js/clearInterval timer)
         (js/alert "You starve."))))))
+
+;; Messages
+
+(reg-event-db
+ :send-message
+ db-spec-interceptors
+ (fn send-message-handler [db [_ message]]
+   (send-message db message)))
 
 ;; Interactive
 
