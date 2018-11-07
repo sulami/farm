@@ -99,7 +99,7 @@
    :messages '("Today is a wonderful day."
                "Let's plant some seeds."
                "Don't starve.")
-   :activity [[:nothing] 0]
+   :activity [[:idle] 0]
    :family [{:name "You"
              :age 18}]
 

@@ -126,7 +126,7 @@
 (reg-event-fx
  :finish-action
  (fn finish-action-handler [{:keys [db]} [_ action]]
-   {:db (update-in db [:activity] (constantly [[:nothing] 0]))
+   {:db (update-in db [:activity] (constantly [[:idle] 0]))
     :dispatch action}))
 
 (reg-event-db

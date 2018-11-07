@@ -97,7 +97,7 @@
    (-> activity
        first
        first
-       (not= :nothing))))
+       (not= :idle))))
 
 (reg-sub
  :current-activity-time
