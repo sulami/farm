@@ -83,7 +83,7 @@
                                     8 0)]
          (and (-> plant :water (> 0))
               (-> freezing-temperature rand-int (- temperature) neg?)
-              (-> (rand-int 100) (- 100) (- (:survival-mod weather) neg?))))))
+              (-> (rand-int 100) (- 100) (- (:survival-mod weather)) neg?)))))
 
 (defn update-plants
   "Update all plants."
