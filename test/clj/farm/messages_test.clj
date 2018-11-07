@@ -4,8 +4,8 @@
             [farm.messages :refer :all]))
 
 (deftest send-message-handler-test
-  (let [db (initialize-db {} [:initialize-db])
-        db' (send-message db "toast")]
+  (let* [db (initialize-db {} [:initialize-db])
+         db' (send-message db "toast")]
 
     (testing "it preserves messages as a list"
       (is (-> db' :messages list?)))
