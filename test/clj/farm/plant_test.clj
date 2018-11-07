@@ -116,9 +116,9 @@
   (testing "after many runs it"
     (let* [db (initialize-db {} [:initialize-db])
            db' (as-> db input
-                   (grow-plants-helper input 5)
-                   (iterate #(update-plants % [:update-plants]) input)
-                   (nth input 20))]
+                 (grow-plants-helper input 5)
+                 (iterate #(update-plants % [:update-plants]) input)
+                 (nth input 20))]
 
       (testing "it reduces plant water"
         (is (= (repeat 5 (- config/max-plant-water 20))
@@ -138,7 +138,7 @@
     (let* [db (initialize-db {} [:initialize-db])
            low-water-plant (set-in config/new-plant [:water] 1)
            db' (-> db
-                   (update-in [:plants] #(insert-at low-water-plant 0 %))
+                   (update-in [:plants] (partial insert-at low-water-plant 0))
                    (update-plants [:update-plants]))]
 
       (testing "it doesn't change the field size"
@@ -148,7 +148,26 @@
       (testing "it kills the plant"
         (is (->> db'
                  :plants
-                 (every? nil?)))))))
+                 (every? nil?))))))
+
+  (testing "with weather"
+    (let* [medium-water (/ config/max-plant-water 2)
+           medium-water-plant (set-in config/new-plant [:water] medium-water)
+           db (-> (initialize-db {} [:intitialize-db])
+                  (update-in [:plants] (partial insert-at medium-water-plant 0)))]
+
+      (testing "it changes water according to the weather modifier"
+        (doall
+         (for [weather config/weathers]
+           (is (= (:water-mod weather)
+                  (-> db
+                      (update-in [:weather] (constantly weather))
+                      (update-plants [:update-plants])
+                      :plants
+                      first
+                      :water
+                      (+ 1)
+                      (- medium-water))))))))))
 
 (deftest harvest-test
   (let [db (initialize-db {} [:initialize-db])]

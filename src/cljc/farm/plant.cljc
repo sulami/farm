@@ -46,16 +46,14 @@
   "Update water on a plant depending on the weather."
   [plant weather]
   (when-not (nil? plant)
-    (update-in plant
-               [:water]
-               (-> (case weather
-                     :manual #(+ % 10)
-                     :sunny #(- % 2)
-                     :rain inc
-                     :hail inc
-                     :thunderstorm inc
-                     dec)
-                   (within-bounds 0 config/max-plant-water)))))
+    (let [weather-mod-fn (fn weather-mod-fn [water]
+                           (-> weather
+                               :water-mod
+                               (+ water)))]
+      (update-in plant
+                 [:water]
+                 (within-bounds (comp weather-mod-fn dec)
+                                0 config/max-plant-water)))))
 
 (defn grow-plant
   "Grow a plant, depending on the current environment, and return it.
