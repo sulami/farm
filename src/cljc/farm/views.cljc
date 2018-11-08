@@ -65,6 +65,18 @@
                    :value "Sell 10"
                    :on-click #(dispatch [:trade-resource :sell resource 10])}]]]))
 
+(defn action-button
+  [text action]
+  (let [active @(subscribe [:active])]
+    [:input {:type "button"
+             :class (str "rounded px-2 py-1 text-white "
+                         (if active
+                           "bg-grey"
+                           "bg-grey-darker hover:bg-grey-dark"))
+             :value text
+             :disabled active
+             :on-click action}]))
+
 (defn game-page []
   (let [state (subscribe [:state])]
     [:div
@@ -111,10 +123,8 @@
 
      ;; Actions
      [:div
-      [:input {:type "button"
-               :class "rounded bg-grey-darker hover:bg-grey-dark text-white px-2 py-1"
-               :value "Water plants"
-               :on-click #(dispatch [:delayed-action 1500 [:water-plants]])}]]
+      (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
+      (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
 
      ;; Field
      [:div
