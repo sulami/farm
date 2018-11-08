@@ -1,7 +1,8 @@
 (ns farm.economy-test
   (:require [clojure.test :refer :all]
             [farm.economy :refer :all]
-            [farm.events :refer [initialize-db]]))
+            [farm.events :refer [initialize-db]]
+            [farm.config :as config]))
 
 (deftest resource-price-key-test
   (testing "is appending '-price'"
@@ -54,3 +55,13 @@
         (testing "adds the right amount of money"
           (is (= (-> db :money)
                  (-> db' :money (- price)))))))))
+
+(deftest chop-wood-test
+  (let [db (initialize-db {} [:intitialize-db])]
+
+    (testing "it increases wood by the correct amount"
+      (is (= (:wood db)
+             (-> db
+                 (chop-wood [:chop-wood])
+                 :wood
+                 (- config/wood-per-chop)))))))

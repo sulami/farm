@@ -77,6 +77,7 @@
 ; Economy
 (defonce plant-seed-cost 12) ; Seeds / plant
 (defonce food-per-plant 18) ; Gained upon harvesting
+(defonce wood-per-chop 12)
 
 ; Happenings
 (defonce happenings [{:game-time 7
