@@ -103,6 +103,7 @@
         [:tr (format "Money: %ip" (-> @state :money))]
         (resource-block :seed)
         (resource-block :food)
+        (resource-block :wood)
         [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
         [:tr (format "Weather: %s" @(subscribe [:weather]))]
         ;; XXX for debugging purposes only

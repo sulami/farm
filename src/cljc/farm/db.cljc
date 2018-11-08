@@ -48,6 +48,8 @@
 (s/def ::seed-price int?)
 (s/def ::food int?)
 (s/def ::food-price int?)
+(s/def ::wood int?)
+(s/def ::wood-price int?)
 (s/def ::temperature float?)
 
 (s/def ::probability int?)
@@ -87,6 +89,8 @@
                    ::seed-price
                    ::food
                    ::food-price
+                   ::wood
+                   ::wood-price
                    ::temperature
                    ::weather
                    ::plants]))
@@ -109,6 +113,8 @@
    :seed-price 8
    :food 587
    :food-price 8
+   :wood 0
+   :wood-price 8
 
    ;; Farming
    :temperature 10
