@@ -6,6 +6,9 @@
 (def game-speed 3000) ; Real seconds per game day
 (def length-of-year 360) ; Days
 (def field-size 300)
+(def loss-messages
+  {:starving "You run out of food and slowly starve to death."
+   :debt "After being in debt, your farm gets taken over by your lord. You die in his dungeon shortly after."})
 
 ; Time
 (def days-of-the-week

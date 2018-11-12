@@ -1,4 +1,5 @@
-(ns farm.utils)
+(ns farm.utils
+  (:require [farm.config :as config]))
 
 (defn debug-print
   "Print a value and return it."
@@ -67,12 +68,13 @@
 (defn check-lose-handler
   "Checks whether a loss condition has been hit and triggers loss."
   [{:keys [db]} _]
-  (let [lost (or (-> db :food (<= 0))
-                 (-> db :money (< 0)))]
-    {:dispatch (when lost
-                 [:lose :cause])}))
+  {:dispatch
+   (cond
+       (-> db :food (<= 0)) [:lose :starving]
+       (-> db :money (< 0)) [:lose :debt]
+       :else nil)})
 
 (defn lose
   "Incognicto event handler that sends out a message describing the loss."
-  [cause]
-  {})
+  [reason]
+  {:dispatch [:send-message (reason config/loss-messages)]})

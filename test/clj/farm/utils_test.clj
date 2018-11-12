@@ -95,19 +95,17 @@
             :dispatch
             nil?)))
 
-  (testing "it triggers loss if run out of food"
-    (is (= :lose
+  (testing "it triggers loss if running out of food"
+    (is (= [:lose :starving]
            (-> {:db (set-in default-db [:food] 0)}
                (check-lose-handler [:check-lose])
-               :dispatch
-               first))))
+               :dispatch))))
 
   (testing "it triggers loss if in negative standing"
-    (is (= :lose
+    (is (= [:lose :debt]
            (-> {:db (set-in default-db [:money] -1)}
                (check-lose-handler [:check-lose])
-               :dispatch
-               first))))
+               :dispatch))))
 
   (testing "it doesn't trigger loss if at zero money"
     (is (-> {:db (set-in default-db [:money] 0)}

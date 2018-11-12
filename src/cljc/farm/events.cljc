@@ -98,9 +98,9 @@
 (reg-event-fx
  :lose
  (fn lose-handler
-   [{:keys db} [_ cause]]
+   [{:keys [db]} [_ reason]]
    #?(:cljs (js/clearInterval timer))
-   (lose cause)))
+   (lose reason)))
 
 ;; Happenings
 (reg-event-fx
@@ -139,6 +139,7 @@
  :trade-resource
  db-spec-interceptors
  trade-resource)
+
 
 (reg-event-db
  :water-plants
