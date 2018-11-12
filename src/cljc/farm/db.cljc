@@ -1,7 +1,6 @@
 (ns farm.db
   (:require [clojure.spec.alpha :as s]
-            [farm.config :as config]
-            [farm.utils :refer [in?]]))
+            [farm.config :as config]))
 
 ;; Specs
 ;; TODO These need proper naming and namespacing.

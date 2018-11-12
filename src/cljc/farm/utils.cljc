@@ -63,3 +63,16 @@
     (-> f
         (apply args)
         (fuzz amount))))
+
+(defn check-lose-handler
+  "Checks whether a loss condition has been hit and triggers loss."
+  [{:keys [db]} _]
+  (let [lost (or (-> db :food (<= 0))
+                 (-> db :money (< 0)))]
+    {:dispatch (when lost
+                 [:lose :cause])}))
+
+(defn lose
+  "Incognicto event handler that sends out a message describing the loss."
+  [cause]
+  {})

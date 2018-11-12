@@ -1,6 +1,7 @@
 (ns farm.utils-test
   (:require  [clojure.test :refer :all]
-             [farm.utils :refer :all]))
+             [farm.utils :refer :all]
+             [farm.db :refer [default-db]]))
 
 (deftest insert-at-test
   (testing "for vectors it"
@@ -86,3 +87,30 @@
                   distinct
                   (take 5)
                   sort))))))
+
+(deftest check-lose-handler-test
+  (testing "it doesn't do anything on the default game state"
+    (is (-> {:db default-db}
+            (check-lose-handler [:check-lose])
+            :dispatch
+            nil?)))
+
+  (testing "it triggers loss if run out of food"
+    (is (= :lose
+           (-> {:db (set-in default-db [:food] 0)}
+               (check-lose-handler [:check-lose])
+               :dispatch
+               first))))
+
+  (testing "it triggers loss if in negative standing"
+    (is (= :lose
+           (-> {:db (set-in default-db [:money] -1)}
+               (check-lose-handler [:check-lose])
+               :dispatch
+               first))))
+
+  (testing "it doesn't trigger loss if at zero money"
+    (is (-> {:db (set-in default-db [:money] 0)}
+            (check-lose-handler [:check-lose])
+            :dispatch
+            nil?))))

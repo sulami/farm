@@ -8,7 +8,7 @@
             [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
-            [farm.utils :refer [set-in]]
+            [farm.utils :refer [check-lose-handler lose set-in]]
             [farm.views :refer [timer]]))
 
 ;; Spec Validation
@@ -93,11 +93,14 @@
 
 (reg-event-fx
  :check-lose
- (fn check-lose-handler [{:keys [db]} _]
-   (when (-> db :food (<= 0))
-     #?(:cljs (do
-        (js/clearInterval timer)
-        (js/alert "You starve."))))))
+ check-lose-handler)
+
+(reg-event-fx
+ :lose
+ (fn lose-handler
+   [{:keys db} [_ cause]]
+   #?(:cljs (js/clearInterval timer))
+   (lose cause)))
 
 ;; Happenings
 (reg-event-fx
