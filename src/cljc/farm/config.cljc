@@ -16,6 +16,8 @@
    "Friday"
    "Saturday"
    "Sunday"])
+(def length-of-week
+  (count days-of-the-week))
 (def seasons
   ["Spring"
    "Summer"

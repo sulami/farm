@@ -19,9 +19,9 @@
              (-> (fire-happenings-handler {:db db} [:fire-happenings])
                  :dispatch-n))))))
 
-(deftest collect-taxes-test
+(deftest collect-taxes-handler-test
   (let* [db (initialize-db {} [:initialize-db])
-         rv (collect-taxes {:db db} [:collect-taxes])]
+         rv (collect-taxes-handler {:db db} [:collect-taxes])]
 
     (testing "it fires a message"
       (is (= :send-message

@@ -12,7 +12,7 @@
           (filter #(= (:game-time %) now))
           (map :event))}))
 
-(defn collect-taxes
+(defn collect-taxes-handler
   "Reduces money and sends out a message."
   [{:keys [db]} _]
   {:dispatch [:send-message "Taxes are being collected."]

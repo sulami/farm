@@ -5,7 +5,7 @@
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
             [farm.economy :refer [chop-wood consume-food food-price trade-resource]]
-            [farm.happenings :refer [fire-happenings-handler]]
+            [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
@@ -102,7 +102,7 @@
 ;; Happenings
 (reg-event-fx
  :collect-taxes
- happenings/collect-taxes)
+ collect-taxes-handler)
 
 ;; Messages
 
@@ -156,11 +156,3 @@
  :chop-wood
  db-spec-interceptors
  chop-wood)
-
-;; On demand
-
-(reg-event-db
- :send-message
- db-spec-interceptors
- (fn send-message-handler [db [_ message]]
-   (update-in db [:messages] #(conj % message))))

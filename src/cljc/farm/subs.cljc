@@ -45,7 +45,7 @@
  :<- [:game-time]
  (fn day-of-the-week-sub [game-time _]
    (nth config/days-of-the-week
-        (mod game-time (count config/days-of-the-week)))))
+        (mod game-time config/length-of-week))))
 
 (reg-sub
  :season
