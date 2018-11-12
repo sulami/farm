@@ -18,3 +18,21 @@
       (is (= [(:event happening)]
              (-> (fire-happenings-handler {:db db} [:fire-happenings])
                  :dispatch-n))))))
+
+(deftest collect-taxes-test
+  (let* [db (initialize-db {} [:initialize-db])
+         rv (collect-taxes {:db db} [:collect-taxes])]
+
+    (testing "it fires a message"
+      (is (= :send-message
+             (-> rv
+                 :dispatch
+                 first))))
+
+    (testing "it reduces money"
+      (is (= config/taxes
+             (-> rv
+                 :db
+                 :money
+                 (- (:money db))
+                 (* -1)))))))

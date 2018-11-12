@@ -9,8 +9,7 @@
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
             [farm.utils :refer [set-in]]
-            [farm.views :refer [timer]]
-            [farm.config :as config]))
+            [farm.views :refer [timer]]))
 
 ;; Spec Validation
 
@@ -103,9 +102,7 @@
 ;; Happenings
 (reg-event-fx
  :collect-taxes
- (fn collect-taxes-handler [{:keys [db]} _]
-   {:dispatch [:send-message "Taxes are being collected."]
-    :db (update-in db [:money] #(- % config/taxes))}))
+ happenings/collect-taxes)
 
 ;; Messages
 
