@@ -11,6 +11,8 @@
 (s/def ::game-time
   ::positive-int)
 
+(s/def ::alive boolean?)
+
 (s/def ::event
   (s/and vector?
          #(-> % first keyword?)))
@@ -98,6 +100,7 @@
 
 (def default-db
   {:game-time 0
+   :alive true
    :happenings config/happenings
    :messages '("Today is a wonderful day."
                "Let's plant some seeds."

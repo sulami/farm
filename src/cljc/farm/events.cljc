@@ -100,7 +100,7 @@
  (fn lose-handler
    [{:keys [db]} [_ reason]]
    #?(:cljs (js/clearInterval timer))
-   (lose reason)))
+   (lose db reason)))
 
 ;; Happenings
 (reg-event-fx

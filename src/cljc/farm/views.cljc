@@ -67,14 +67,14 @@
 
 (defn action-button
   [text action]
-  (let [active @(subscribe [:active])]
+  (let [able-to-act @(subscribe [:able-to-act])]
     [:input {:type "button"
              :class (str "rounded px-2 py-1 text-white "
-                         (if active
-                           "bg-grey"
-                           "bg-grey-darker hover:bg-grey-dark"))
+                         (if able-to-act
+                           "bg-grey-darker hover:bg-grey-dark"
+                           "bg-grey"))
              :value text
-             :disabled active
+             :disabled (not able-to-act)
              :on-click action}]))
 
 (defn game-page []

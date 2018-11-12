@@ -76,5 +76,6 @@
 
 (defn lose
   "Incognicto event handler that sends out a message describing the loss."
-  [reason]
-  {:dispatch [:send-message (reason config/loss-messages)]})
+  [db reason]
+  {:db (set-in db [:alive] false)
+   :dispatch [:send-message (reason config/loss-messages)]})

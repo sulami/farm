@@ -106,3 +106,16 @@
    (-> activity
        second
        (/ 1000))))
+
+(reg-sub
+ :alive
+ (fn alive-sub [db _]
+   (:alive db)))
+
+(reg-sub
+ :able-to-act
+ :<- [:alive]
+ :<- [:active]
+ (fn able-to-act-sub [[alive active] _]
+   (and alive
+        (not active))))
