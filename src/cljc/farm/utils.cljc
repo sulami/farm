@@ -68,11 +68,10 @@
 (defn check-lose-handler
   "Checks whether a loss condition has been hit and triggers loss."
   [{:keys [db]} _]
-  {:dispatch
-   (cond
-       (-> db :food (<= 0)) [:lose :starving]
-       (-> db :money (< 0)) [:lose :debt]
-       :else nil)})
+  (cond
+    (-> db :food (<= 0)) {:dispatch [:lose :starving]}
+    (-> db :money (< 0)) {:dispatch [:lose :debt]}
+    :else {}))
 
 (defn lose
   "Incognicto event handler that sends out a message describing the loss."
