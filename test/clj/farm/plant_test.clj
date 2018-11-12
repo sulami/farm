@@ -161,7 +161,7 @@
          (for [weather config/weathers]
            (is (= (:water-mod weather)
                   (-> db
-                      (update-in [:weather] (constantly weather))
+                      (set-in [:weather] weather)
                       (update-plants [:update-plants])
                       :plants
                       first
