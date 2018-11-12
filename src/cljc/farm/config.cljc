@@ -75,12 +75,23 @@
                     :water max-plant-water})
 
 ; Economy
+(defonce taxes 50)
 (defonce plant-seed-cost 12) ; Seeds / plant
 (defonce food-per-plant 18) ; Gained upon harvesting
 (defonce wood-per-chop 12)
 
 ; Happenings
-(defonce happenings [{:game-time 7
-                      :event [:send-message "You survived one week. Congratulations!"]}
-                     {:game-time 360
-                      :event [:send-message "It's a new year."]}])
+(defonce manual-happenings
+  [{:game-time 7
+    :event [:send-message "You survived one week. Congratulations!"]}
+   {:game-time 360
+    :event [:send-message "It's a new year."]}])
+(defonce tax-happenings
+  (map
+   (fn [game-time]
+     {:game-time game-time
+      :event [:collect-taxes]})
+   (range 30 (* 30 12 30) 30)))
+(defonce happenings
+  (vec (concat manual-happenings
+               tax-happenings)))
