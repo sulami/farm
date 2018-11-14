@@ -55,13 +55,3 @@
         (testing "adds the right amount of money"
           (is (= (-> db :money)
                  (-> db' :money (- price)))))))))
-
-(deftest chop-wood-test
-  (let [db (initialize-db {} [:intitialize-db])]
-
-    (testing "it increases wood by the correct amount"
-      (is (= (:wood db)
-             (-> db
-                 (chop-wood [:chop-wood])
-                 :wood
-                 (- config/wood-per-chop)))))))

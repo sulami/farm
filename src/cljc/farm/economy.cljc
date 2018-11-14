@@ -40,8 +40,3 @@
               (-> db
                   (update-in [:money] #(+ % resource-cost))
                   (update-in [resource] #(- % number)))))))
-
-(defn chop-wood
-  "Increase wood by config/wood-per-chop."
-  [db _]
-  (update-in db [:wood] (partial + config/wood-per-chop)))
