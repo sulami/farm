@@ -14,4 +14,12 @@
                  :wood
                  (- config/wood-per-chop)))))))
 
-(deftest )
+(deftest hunt-handler-test
+  (let [db (initialize-db {} [:initialize-db])]
+
+    (testing "it increases food by the correct amount"
+      (is (= (:food db)
+             (-> db
+                 (hunt-handler [:hunt])
+                 :food
+                 (- config/food-per-hunt)))))))

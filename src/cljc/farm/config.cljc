@@ -85,6 +85,7 @@
 (def food-per-plant 18) ; Gained upon harvesting
 (def seed-per-plant 5) ; Gained upon harvesting
 (def wood-per-chop 12)
+(def food-per-hunt 4)
 
 ; Happenings
 (def manual-happenings

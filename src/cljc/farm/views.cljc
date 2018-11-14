@@ -71,7 +71,6 @@
      [:h2 {:class "text-center py-4"}
       "Farm"]
 
-     ;; Activity
      (let [active (subscribe [:active])]
        [:div {:class "w-full text-center"}
         (format "Activity: %s" @(subscribe [:current-activity-name]))
@@ -103,8 +102,10 @@
 
      [:h4 "Actions"]
      [:div {:class "flex"}
-      (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
-      (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
+      (action-button "Water plants" #(dispatch [:delayed-action 1000 [:water-plants]]))
+      (action-button "Chop wood" #(dispatch [:delayed-action 2500 [:chop-wood]]))
+      (action-button "Go hunting" #(dispatch [:delayed-action 3000 [:hunt]]))
+      (action-button "Go to the market" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
 
      [:h4 "Field"]
      [:div

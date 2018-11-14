@@ -8,7 +8,7 @@
             [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest-handler plant-seeds-handler update-plants water-plants]]
-            [farm.resource :refer [chop-wood-handler]]
+            [farm.resource :refer [chop-wood-handler hunt-handler]]
             [farm.utils :refer [check-lose-handler lose set-in]]
             [farm.views :refer [timer]]))
 
@@ -160,3 +160,8 @@
  :chop-wood
  db-spec-interceptors
  chop-wood-handler)
+
+(reg-event-db
+ :hunt
+ db-spec-interceptors
+ hunt-handler)
