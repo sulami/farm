@@ -76,7 +76,7 @@
                           (<= 0)))]
     (cond
       freezing {:dispatch [:lose :freezing]}
-      (-> db :food (<= 0)) {:dispatch [:lose :starving]}
+      (-> db :food zero?) {:dispatch [:lose :starving]}
       (-> db :money (< 0)) {:dispatch [:lose :debt]}
       :else {})))
 

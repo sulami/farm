@@ -5,7 +5,7 @@
   "Updates the db to consume food."
   [db _]
   (let [consumption (-> db :family count)]
-    (update-in db [:food] #(- % consumption))))
+    (update-in db [:food] #(max 0 (- % consumption)))))
 
 (defn food-price
   "Determines the food price, max(2d6), 7-8ish."
