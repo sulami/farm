@@ -48,17 +48,9 @@
 
 (defn resource-block [resource]
   (let [state (subscribe [:state])
-        resource-name (-> resource str (str/replace-first ":" "") str/capitalize)
-        price-key (resource-price-key resource)]
-    [:tr
-     [:td (format "%s: %d" resource-name (-> @state resource))]
-     [:td (format "Price/10: %ip" (-> @state price-key))]
-     [:td [:input {:type "button"
-                   :value "Buy 10"
-                   :on-click #(dispatch [:trade-resource :buy resource 10])}]]
-     [:td [:input {:type "button"
-                   :value "Sell 10"
-                   :on-click #(dispatch [:trade-resource :sell resource 10])}]]]))
+        resource-name (-> resource str (str/replace-first ":" "") str/capitalize)]
+    [:div {:class "flex-1"}
+     (format "%s: %d" resource-name (-> @state resource))]))
 
 (defn action-button
   [text action]
@@ -102,17 +94,14 @@
      ;; State
      [:div
       [:p @(subscribe [:formatted-date])]
-      [:table
-       [:tbody
-        [:tr (str "Family: " @(subscribe [:formatted-family]))]
-        [:tr (format "Money: %ip" (-> @state :money))]
-        (resource-block :seed)
-        (resource-block :food)
-        (resource-block :wood)
-        [:tr (format "Temperature: %.1f°C" (-> @state :temperature))]
-        [:tr (format "Weather: %s" @(subscribe [:weather]))]
-        ;; XXX for debugging purposes only
-        [:tr (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]]]
+      [:div (str "Family: " @(subscribe [:formatted-family]))]
+      [:div (format "Money: %ip" (-> @state :money))]
+      [:div {:class "flex"}
+       (map resource-block [:food :seed :wood])]
+      [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
+      [:div (format "Weather: %s" @(subscribe [:weather]))]
+      ;; XXX for debugging purposes only
+      [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]
 
      ;; Actions
      [:div
