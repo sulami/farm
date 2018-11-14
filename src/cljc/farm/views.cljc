@@ -29,11 +29,6 @@
                 (+ end)))]
     (map f config/plant-green config/plant-brown)))
 
-(defn format-person [person]
-  (format "%s (%i)"
-          (:name person)
-          (:age person)))
-
 (defn draw-plant [plant position]
   (let* [age (-> plant :age)
          color (->> plant :water plant-color (apply cljs->rgb))
@@ -109,9 +104,7 @@
       [:p @(subscribe [:formatted-date])]
       [:table
        [:tbody
-        [:tr (str "Family: " (->> @state :family
-                                  (map format-person)
-                                  (str/join ", ")))]
+        [:tr (str "Family: " @(subscribe [:formatted-family]))]
         [:tr (format "Money: %ip" (-> @state :money))]
         (resource-block :seed)
         (resource-block :food)

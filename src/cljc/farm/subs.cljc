@@ -119,3 +119,18 @@
  (fn able-to-act-sub [[alive active] _]
    (and alive
         (not active))))
+
+;; FAMILY
+
+(reg-sub
+ :family
+ (fn family-sub [db _]
+   (:family db)))
+
+(reg-sub
+ :formatted-family
+ :<- [:family]
+ (fn formatted-family-sub [family _]
+   (->> family
+        (map #(format "%s (%i)" (:name %) (:age %)))
+        (str/join ", "))))
