@@ -208,4 +208,8 @@
 
         (testing "it increases food amount"
           (is (= (-> db :food)
-                 (-> db' :food (- config/food-per-plant)))))))))
+                 (-> db' :food (- config/food-per-plant)))))
+
+        (testing "it increases seed amount"
+          (is (= (-> db :seed)
+                 (-> db' :seed (- config/seed-per-plant)))))))))

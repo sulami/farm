@@ -83,6 +83,7 @@
 (def taxes 14)
 (def plant-seed-cost 12) ; Seeds / plant
 (def food-per-plant 18) ; Gained upon harvesting
+(def seed-per-plant 5) ; Gained upon harvesting
 (def wood-per-chop 12)
 
 ; Happenings
