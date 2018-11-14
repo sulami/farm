@@ -116,7 +116,7 @@
    :food 587
    :food-price 8
    :wood 80
-   :wood-price 8
+   :wood-price 14
 
    ;; Farming
    :temperature 10

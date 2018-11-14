@@ -4,7 +4,7 @@
             [re-frame.core :refer [->interceptor after reg-event-db reg-event-fx]]
             [farm.db :as db]
             [farm.climate :refer [consume-wood-handler temperature weather]]
-            [farm.economy :refer [consume-food-handler food-price trade-resource-handler]]
+            [farm.economy :refer [consume-food-handler resource-price trade-resource-handler]]
             [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest-handler plant-seeds-handler update-plants water-plants]]
@@ -87,7 +87,10 @@
  :update-prices
  db-spec-interceptors
  (fn update-prices-handler [db _]
-   (set-in db [:food-price] (food-price))))
+   (-> db
+       (set-in [:food-price] (resource-price))
+       (set-in [:seed-price] (resource-price))
+       (set-in [:wood-price] (resource-price)))))
 
 (reg-event-db
  :update-plants

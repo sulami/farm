@@ -10,9 +10,9 @@
     (is (= :foo-price
            (resource-price-key :foo)))))
 
-(deftest food-price-test
+(deftest resource-price-test
   (testing "is within bounds"
-    (let [prices (repeatedly 1000 food-price)
+    (let [prices (repeatedly 1000 resource-price)
           lower-bound 2
           upper-bound 12]
       (is (every? #(<= lower-bound % upper-bound) prices)))))

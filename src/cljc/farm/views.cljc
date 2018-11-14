@@ -106,12 +106,19 @@
      [:div {:class "flex"}
       (map resource-block [:food :seed :wood])]
 
+     [:h4 "Marketplace"]
+     [:div {:class "flex"}
+      (for [resource [:food :seed :wood]
+            action [:buy :sell]]
+        (action-button
+         (format "%s %s" (-> action name str/capitalize) (name resource))
+         #(dispatch [:delayed-action 1500 [:trade-resource action resource 10]])))]
+
      [:h4 "Actions"]
      [:div {:class "flex"}
       (action-button "Water plants" #(dispatch [:delayed-action 1000 [:water-plants]]))
       (action-button "Chop wood" #(dispatch [:delayed-action 2500 [:chop-wood]]))
-      (action-button "Go hunting" #(dispatch [:delayed-action 3000 [:hunt]]))
-      (action-button "Go to the market" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
+      (action-button "Go hunting" #(dispatch [:delayed-action 3000 [:hunt]]))]
 
      [:h4 "Field"]
      [:div

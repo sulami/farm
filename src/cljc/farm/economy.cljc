@@ -7,8 +7,8 @@
   (let [consumption (-> db :family count)]
     (update-in db [:food] #(max 0 (- % consumption)))))
 
-(defn food-price
-  "Determines the food price, max(2d6), 7-8ish."
+(defn resource-price
+  "Determines the price of a resource, max(2d6), 7-8ish."
   []
   (+ 2 (max (+ (rand-int 6) (rand-int 6))
             (+ (rand-int 6) (rand-int 6)))))
