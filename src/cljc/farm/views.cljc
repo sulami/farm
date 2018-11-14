@@ -56,7 +56,7 @@
   [text action]
   (let [able-to-act @(subscribe [:able-to-act])]
     [:input {:type "button"
-             :class (str "rounded px-2 py-1 text-white "
+             :class (str "flex-none m-1 rounded px-2 py-1 text-white "
                          (if able-to-act
                            "bg-grey-darker hover:bg-grey-dark"
                            "bg-grey"))
@@ -84,27 +84,29 @@
                                                @(subscribe [:current-activity-time]))
                                        "none")}}])]])
 
-     ;; Messages
+     [:h4 "Messages"]
      (map #(into [:p {:class (format "m-0 text-%s" %2)} %1])
           @(subscribe [:messages])
           ["black" "grey-dark" "grey-light"])
 
-     ;; State
+     [:h4 "Status"]
      [:div @(subscribe [:formatted-date])]
-     [:div (str "Family: " @(subscribe [:formatted-family]))]
-     [:div (format "Money: %ip" (-> @state :money))]
-     [:div {:class "flex"}
-      (map resource-block [:food :seed :wood])]
      [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
      [:div (format "Weather: %s" @(subscribe [:weather]))]
      ;; XXX for debugging purposes only
      [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))]
 
-     ;; Actions
-     (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
-     (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))
+     [:h4 "Inventory"]
+     [:div (format "Money: %ip" (-> @state :money))]
+     [:div {:class "flex"}
+      (map resource-block [:food :seed :wood])]
 
-     ;; Field
+     [:h4 "Actions"]
+     [:div {:class "flex"}
+      (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
+      (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
+
+     [:h4 "Field"]
      [:div
       {:style {:display "flex"
                :flex-wrap "wrap"
