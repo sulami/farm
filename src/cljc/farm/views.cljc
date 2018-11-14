@@ -94,7 +94,9 @@
 
      [:h4 "Status"]
      [:div @(subscribe [:formatted-date])]
-     [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
+     [:div (format "Temperature: %.1f°C (%s)"
+                   (-> @state :temperature)
+                   @(subscribe [:heating-status]))]
      [:div (format "Weather: %s" @(subscribe [:weather]))]
      (when config/debug?
        [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))])

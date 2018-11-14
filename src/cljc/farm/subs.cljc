@@ -73,6 +73,15 @@
        :name
        str/capitalize)))
 
+(reg-sub
+ :heating-status
+ (fn heating-status-sub [db _]
+   (if (-> db
+           :temperature
+           (< config/livable-temperature))
+     "Heating required"
+     "No heating required")))
+
 ;; ACTIVITY
 
 (reg-sub
