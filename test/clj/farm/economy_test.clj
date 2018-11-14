@@ -27,7 +27,7 @@
       (is (= (-> db :food)
              (-> db' :food (+ family)))))))
 
-(deftest trade-resource-test
+(deftest trade-resource-handler-test
   (let* [db (initialize-db {} [:initialize-db])
          resource :food
          resource-key (resource-price-key resource)
@@ -35,7 +35,7 @@
          price (-> db resource-key (* amount) (quot 10))]
 
     (testing "buying"
-      (let [db' (trade-resource db [:trade-resource :buy resource amount])]
+      (let [db' (trade-resource-handler db [:trade-resource :buy resource amount])]
 
         (testing "adds the right amount of resource"
           (is (= (-> db resource)
@@ -46,7 +46,7 @@
                  (-> db' :money (+ price)))))))
 
     (testing "selling"
-      (let [db' (trade-resource db [:trade-resource :sell resource amount])]
+      (let [db' (trade-resource-handler db [:trade-resource :sell resource amount])]
 
         (testing "deducts the right amont of resource"
           (is (= (-> db resource)

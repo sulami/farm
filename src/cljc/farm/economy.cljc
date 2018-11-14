@@ -21,7 +21,7 @@
       (str "-price")
       keyword))
 
-(defn trade-resource
+(defn trade-resource-handler
   "Trade `number` amount of `resource` for the current price.
   `:resource` needs to be the key of the resource counter in global state, and
   its price needs to be `:{resource}-price`. Action must be either `:buy` or

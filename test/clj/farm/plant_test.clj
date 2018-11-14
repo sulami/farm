@@ -7,10 +7,10 @@
 
 (def default-weather (first config/weathers))
 
-(deftest plant-seeds-test
+(deftest plant-seeds-handler-test
   (let* [db (initialize-db {} [:initialize-db])
          position 5
-         db' (plant-seeds db [:plant-seeds position])]
+         db' (plant-seeds-handler db [:plant-seeds position])]
 
     (testing "reduces seed amount"
       (is (= (-> db :seed)
@@ -32,7 +32,7 @@
   "Helper to grow n plants on the field in db."
   ([db start end]
    (reduce (fn planting-reducer [acc x]
-             (plant-seeds acc [:plant-seeds x]))
+             (plant-seeds-handler acc [:plant-seeds x]))
            db
            (range start end)))
   ([db end]
@@ -169,12 +169,12 @@
                       (+ 1)
                       (- medium-water))))))))))
 
-(deftest harvest-test
+(deftest harvest-handler-test
   (let [db (initialize-db {} [:initialize-db])]
 
     (testing "with a young plant"
       (let [db (grow-plants-helper db 2)
-            db' (harvest db [:harvest 0])]
+            db' (harvest-handler db [:harvest 0])]
 
         (testing "it doesn't change the field size"
           (is (= (-> db :plants count)
@@ -193,7 +193,7 @@
              db (-> db
                     (grow-plants-helper 2)
                     (update-in [:plants] #(insert-at mature-plant 3 %)))
-             db' (harvest db [:harvest 3])]
+             db' (harvest-handler db [:harvest 3])]
 
         (testing "it doesn't change the field size"
           (is (= (-> db :plants count)

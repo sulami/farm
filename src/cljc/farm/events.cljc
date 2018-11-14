@@ -4,11 +4,11 @@
             [re-frame.core :refer [->interceptor after reg-event-db reg-event-fx]]
             [farm.db :as db]
             [farm.climate :refer [temperature weather]]
-            [farm.economy :refer [consume-food food-price trade-resource]]
+            [farm.economy :refer [consume-food food-price trade-resource-handler]]
             [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
-            [farm.plant :refer [harvest plant-seeds update-plants water-plants]]
-            [farm.resource :refer [chop-wood]]
+            [farm.plant :refer [harvest-handler plant-seeds-handler update-plants water-plants]]
+            [farm.resource :refer [chop-wood-handler]]
             [farm.utils :refer [check-lose-handler lose set-in]]
             [farm.views :refer [timer]]))
 
@@ -139,8 +139,7 @@
 (reg-event-db
  :trade-resource
  db-spec-interceptors
- trade-resource)
-
+ trade-resource-handler)
 
 (reg-event-db
  :water-plants
@@ -150,14 +149,14 @@
 (reg-event-db
  :plant-seeds
  db-spec-interceptors
- plant-seeds)
+ plant-seeds-handler)
 
 (reg-event-db
  :harvest
  db-spec-interceptors
- harvest)
+ harvest-handler)
 
 (reg-event-db
  :chop-wood
  db-spec-interceptors
- chop-wood)
+ chop-wood-handler)

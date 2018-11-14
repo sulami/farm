@@ -2,7 +2,7 @@
   (:require [farm.config :as config]
             [farm.utils :refer [insert-at in? update-when within-bounds]]))
 
-(defn plant-seeds
+(defn plant-seeds-handler
   "Plant some seeds on a specific position."
   [db [_ position]]
   (let [new-seed (-> db :seed (- config/plant-seed-cost))
@@ -95,7 +95,7 @@
                       (map #(update-plant-water % weather))
                       (map #(when (plant-alive? % weather temperature) %)))))))
 
-(defn harvest
+(defn harvest-handler
   "Harvest a plant in a position adding some food."
   [db [_ position]]
   (let* [plants (:plants db)
