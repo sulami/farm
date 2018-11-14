@@ -22,8 +22,7 @@
   (testing "food is reduced by number of family members"
     (let* [db (initialize-db {} [:initialize-db])
            family (-> db :family count)
-           event [:consume-food]
-           db' (consume-food db event)]
+           db' (consume-food-handler db [:consume-food])]
       (is (= (-> db :food)
              (-> db' :food (+ family)))))))
 
