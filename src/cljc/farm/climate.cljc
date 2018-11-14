@@ -39,6 +39,7 @@
                    (- config/livable-temperature)
                    (* -1)
                    (max 0)
-                   (/ 2))]
+                   (/ 2)
+                   int)]
     (update-in db [:wood] #(-> (- % amount)
                                (max 0)))))
