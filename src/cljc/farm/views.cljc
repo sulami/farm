@@ -48,9 +48,13 @@
 
 (defn resource-block [resource]
   (let [state (subscribe [:state])
-        resource-name (-> resource str (str/replace-first ":" "") str/capitalize)]
+        resource-name (-> resource name str/capitalize)
+        price-key (resource-price-key resource)
+        price-info (if config/debug?
+                     (format " (%sp/10)" (price-key @state))
+                     "")]
     [:div {:class "flex-1"}
-     (format "%s: %d" resource-name (-> @state resource))]))
+     (format "%s: %d%s" resource-name (resource @state) price-info)]))
 
 (defn action-button
   [text action]
@@ -92,8 +96,8 @@
      [:div @(subscribe [:formatted-date])]
      [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
      [:div (format "Weather: %s" @(subscribe [:weather]))]
-     ;; XXX for debugging purposes only
-     [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))]
+     (when config/debug?
+       [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))])
 
      [:h4 "Inventory"]
      [:div (format "Money: %ip" (-> @state :money))]
