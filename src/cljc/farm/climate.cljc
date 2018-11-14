@@ -1,6 +1,5 @@
 (ns farm.climate
-  (:require [farm.config :as config]
-            [farm.utils :refer [fuzz]]))
+  (:require [farm.config :as config]))
 
 (defn time->season [game-time]
   (nth
@@ -31,3 +30,14 @@
                       (apply concat))]
     (rand-nth (concat (repeat 100 current)
                       weathers))))
+
+(defn consume-wood-handler
+  "Consumes wood based on the temperature."
+  [db _]
+  (let [amount (-> db
+                   :temperature
+                   (- config/livable-temperature)
+                   (* -1)
+                   (max 0)
+                   (/ 2))]
+    (update-in db [:wood] - amount)))

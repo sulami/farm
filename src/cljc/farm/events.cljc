@@ -3,7 +3,7 @@
             #?(:cljs [reagent.format :refer [format]])
             [re-frame.core :refer [->interceptor after reg-event-db reg-event-fx]]
             [farm.db :as db]
-            [farm.climate :refer [temperature weather]]
+            [farm.climate :refer [consume-wood-handler temperature weather]]
             [farm.economy :refer [consume-food food-price trade-resource-handler]]
             [farm.happenings :refer [collect-taxes-handler fire-happenings-handler]]
             [farm.messages :refer [send-message]]
@@ -46,6 +46,7 @@
           [:update-weather]
           [:update-temperature]
           [:consume-food]
+          [:consume-wood]
           [:update-prices]
           [:update-plants]
           [:fire-happenings]
@@ -76,6 +77,11 @@
  :consume-food
  db-spec-interceptors
  consume-food)
+
+(reg-event-db
+ :consume-wood
+ db-spec-interceptors
+ consume-wood)
 
 (reg-event-db
  :update-prices

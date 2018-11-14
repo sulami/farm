@@ -115,7 +115,7 @@
    :seed-price 8
    :food 587
    :food-price 8
-   :wood 0
+   :wood 80
    :wood-price 8
 
    ;; Farming

@@ -28,6 +28,7 @@
    "Winter"])
 
 ; Weather
+(def livable-temperature 18) ; Degrees; below which you need to heat
 (def weathers
   [{:name "Clear"
     :probability 8
