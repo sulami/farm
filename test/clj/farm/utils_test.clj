@@ -1,7 +1,12 @@
 (ns farm.utils-test
   (:require  [clojure.test :refer :all]
              [farm.utils :refer :all]
-             [farm.db :refer [default-db]]))
+             [farm.db :refer [default-db]]
+             [farm.config :as config]))
+
+(defn wrap-db-helper
+  [db]
+  {:db db})
 
 (deftest insert-at-test
   (testing "for vectors it"
@@ -90,25 +95,59 @@
 
 (deftest check-lose-handler-test
   (testing "it doesn't do anything on the default game state"
-    (is (-> {:db default-db}
+    (is (-> default-db
+            wrap-db-helper
             (check-lose-handler [:check-lose])
             :dispatch
             nil?)))
 
   (testing "it triggers loss if running out of food"
     (is (= [:lose :starving]
-           (-> {:db (set-in default-db [:food] 0)}
+           (-> default-db
+               (set-in [:food] 0)
+               wrap-db-helper
                (check-lose-handler [:check-lose])
                :dispatch))))
 
   (testing "it triggers loss if in negative standing"
     (is (= [:lose :debt]
-           (-> {:db (set-in default-db [:money] -1)}
+           (-> default-db
+               (set-in [:money] -1)
+               wrap-db-helper
                (check-lose-handler [:check-lose])
                :dispatch))))
 
   (testing "it doesn't trigger loss if at zero money"
-    (is (-> {:db (set-in default-db [:money] 0)}
+    (is (-> default-db
+            (set-in [:money] 0)
+            wrap-db-helper
+            (check-lose-handler [:check-lose])
+            :dispatch
+            nil?)))
+
+  (testing "it triggers loss if too cold and out of wood"
+    (is (= [:lose :freezing]
+           (-> default-db
+               (set-in [:temperature] (- config/livable-temperature 2))
+               (set-in [:wood] 0)
+               wrap-db-helper
+               (check-lose-handler [:check-lose])
+               :dispatch))))
+
+  (testing "it doesn't trigger loss if too cold but has wood"
+    (is (-> default-db
+            (set-in [:temperature] (- config/livable-temperature 2))
+            (set-in [:wood] 10)
+            wrap-db-helper
+            (check-lose-handler [:check-lose])
+            :dispatch
+            nil?)))
+
+  (testing "it doesn't trigger loss if out of wood but warm"
+    (is (-> default-db
+            (set-in [:temperature] config/livable-temperature)
+            (set-in [:wood] 0)
+            wrap-db-helper
             (check-lose-handler [:check-lose])
             :dispatch
             nil?))))

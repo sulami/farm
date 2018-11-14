@@ -8,7 +8,8 @@
 (def field-size 300)
 (def loss-messages
   {:starving "You run out of food and slowly starve to death."
-   :debt "After being in debt, your farm gets taken over by your lord. You die in his dungeon shortly after."})
+   :debt "After being in debt, your farm gets taken over by your lord. You die in his dungeon shortly after."
+   :freezing "After having run out of fire wood you curl up in a corner of your hut and slowly fall asleep."})
 
 ; Time
 (def days-of-the-week
