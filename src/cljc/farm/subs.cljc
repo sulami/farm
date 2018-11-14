@@ -88,6 +88,7 @@
        first
        first
        name
+       (str/replace #"-" " ")
        str/capitalize)))
 
 (reg-sub
