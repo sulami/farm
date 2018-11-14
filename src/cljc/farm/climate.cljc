@@ -40,4 +40,5 @@
                    (* -1)
                    (max 0)
                    (/ 2))]
-    (update-in db [:wood] - amount)))
+    (update-in db [:wood] #(-> (- % amount)
+                               (max 0)))))

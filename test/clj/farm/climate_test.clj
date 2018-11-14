@@ -67,4 +67,12 @@
                  (set-in [:temperature] (- config/livable-temperature 8))
                  (consume-wood-handler [:consume-wood])
                  :wood
-                 (+ 4)))))))
+                 (+ 4)))))
+
+    (testing "it doesn't consume more wood then there is"
+      (is (= 0
+             (-> db
+                 (set-in [:temperature] (- config/livable-temperature 8))
+                 (set-in [:wood] 1)
+                 (consume-wood-handler [:consume-wood])
+                 :wood))))))
