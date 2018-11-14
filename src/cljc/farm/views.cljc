@@ -72,41 +72,37 @@
       "Farm"]
 
      ;; Activity
-     [:div
-      (let [active (subscribe [:active])]
-        [:div {:class "w-full text-center"}
-         (format "Activity: %s" @(subscribe [:current-activity-name]))
-         [:div {:class "bg-grey-lighter w-full rounded"
-                :style {:height "8px"}}
-          (when @active
-            [:div {:class "bg-grey-darkest rounded h-full"
-                   :style {:animation (if @active
-                                        (format "bar %fs infinite"
-                                                @(subscribe [:current-activity-time]))
-                                        "none")}}])]])]
+     (let [active (subscribe [:active])]
+       [:div {:class "w-full text-center"}
+        (format "Activity: %s" @(subscribe [:current-activity-name]))
+        [:div {:class "bg-grey-lighter w-full rounded"
+               :style {:height "8px"}}
+         (when @active
+           [:div {:class "bg-grey-darkest rounded h-full"
+                  :style {:animation (if @active
+                                       (format "bar %fs infinite"
+                                               @(subscribe [:current-activity-time]))
+                                       "none")}}])]])
 
      ;; Messages
-     [:div
-      (map #(into [:p {:class (format "m-0 text-%s" %2)} %1])
-           @(subscribe [:messages])
-           ["black" "grey-dark" "grey-light"])]
+     (map #(into [:p {:class (format "m-0 text-%s" %2)} %1])
+          @(subscribe [:messages])
+          ["black" "grey-dark" "grey-light"])
 
      ;; State
-     [:div
-      [:p @(subscribe [:formatted-date])]
-      [:div (str "Family: " @(subscribe [:formatted-family]))]
-      [:div (format "Money: %ip" (-> @state :money))]
-      [:div {:class "flex"}
-       (map resource-block [:food :seed :wood])]
-      [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
-      [:div (format "Weather: %s" @(subscribe [:weather]))]
-      ;; XXX for debugging purposes only
-      [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))]]
+     [:div @(subscribe [:formatted-date])]
+     [:div (str "Family: " @(subscribe [:formatted-family]))]
+     [:div (format "Money: %ip" (-> @state :money))]
+     [:div {:class "flex"}
+      (map resource-block [:food :seed :wood])]
+     [:div (format "Temperature: %.1f°C" (-> @state :temperature))]
+     [:div (format "Weather: %s" @(subscribe [:weather]))]
+     ;; XXX for debugging purposes only
+     [:div (format "Field humidity: %i" (->> @state :plants (map :water) avg))]
 
      ;; Actions
-     [:div
-      (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
-      (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))]
+     (action-button "Water plants" #(dispatch [:delayed-action 1200 [:water-plants]]))
+     (action-button "Chop wood" #(dispatch [:delayed-action 3000 [:chop-wood]]))
 
      ;; Field
      [:div
