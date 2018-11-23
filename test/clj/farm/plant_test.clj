@@ -151,23 +151,24 @@
                  (every? nil?))))))
 
   (testing "with weather"
-    (let* [medium-water (/ config/max-plant-water 2)
-           medium-water-plant (assoc-in config/new-plant [:water] medium-water)
-           db (-> (initialize-db {} [:intitialize-db])
-                  (update-in [:plants] (partial insert-at medium-water-plant 0)))]
+    (let [medium-water (/ config/max-plant-water 2)
+          medium-water-plant (assoc-in config/new-plant [:water] medium-water)
+          db (-> (initialize-db {} [:intitialize-db])
+                 (assoc-in [:plants] (repeat config/field-size medium-water-plant)))]
 
       (testing "it changes water according to the weather modifier"
         (doall
          (for [weather config/weathers]
            (is (= (:water-mod weather)
-                  (-> db
-                      (assoc-in [:weather] weather)
-                      (update-plants [:update-plants])
-                      :plants
-                      first
-                      :water
-                      (+ 1)
-                      (- medium-water))))))))))
+                  (some-> db
+                          (assoc-in [:weather] weather)
+                          (update-plants [:update-plants])
+                          :plants
+                          (->> (filter some?))
+                          first
+                          :water
+                          (+ 1)
+                          (- medium-water))))))))))
 
 (deftest harvest-handler-test
   (let [db (initialize-db {} [:initialize-db])]
