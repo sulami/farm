@@ -1,6 +1,8 @@
-# farm
+# Farm
 
-A [re-frame](https://github.com/Day8/re-frame) application designed to ... well, that part is up to you.
+Tests: [![CircleCI](https://circleci.com/gh/sulami/farm.svg?style=svg)](https://circleci.com/gh/sulami/farm)
+
+A harsh farming simulation set in medieval England. Think Stardew Valley meets Darkest Dungeon.
 
 ## Development Mode
 
