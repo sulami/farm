@@ -1,6 +1,6 @@
 (ns farm.plant
   (:require [farm.config :as config]
-            [farm.utils :refer [insert-at in? update-when within-bounds]]))
+            [farm.utils :refer [insert-at in? within-bounds]]))
 
 (defn plant-seeds-handler
   "Plant some seeds on a specific position."
@@ -35,8 +35,8 @@
                                  (take config/water-capacity)
                                  (map :position))
          water-fn (fn [plant]
-                    (update-when plant (->> plant :position (in? positions-to-water))
-                                  water-plant))]
+                    (cond-> plant
+                      (->> plant :position (in? positions-to-water)) water-plant))]
     (->> plants-with-position
          (map water-fn)
          (map :plant)
@@ -68,8 +68,8 @@
                    (* -1)
                    (+ 90)
                    (+ (-> plant :water (quot 3))))]
-      (update-when plant (<= roll bar)
-                   #(update-in % [:age] inc)))))
+      (cond-> plant
+        (<= roll bar) (update-in [:age] inc)))))
 
 (defn plant-alive?
   "Return plant life status. Plants die if they dry out, or freeze.
@@ -103,7 +103,7 @@
          new-plants (insert-at nil position plants)
          new-food (-> db :food (+ config/food-per-plant))
          new-seed (-> db :seed (+ config/seed-per-plant))]
-    (update-when db (-> plant :age (>= config/plant-age))
-                 #(into % {:food new-food
-                           :seed new-seed
-                           :plants new-plants}))))
+    (cond-> db
+      (-> plant :age (>= config/plant-age)) (into {:food new-food
+                                                   :seed new-seed
+                                                   :plants new-plants}))))

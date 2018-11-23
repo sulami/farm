@@ -13,11 +13,6 @@
   [coll element]
   (some #(= element %) coll))
 
-(defn update-when
-  "Update value with f if pred, otherwise return value."
-  [value pred f]
-  (if pred (f value) value))
-
 (defn insert-at
   "Inserts elm into coll at idx, overwriting whatever was there before."
   [elm idx coll]
