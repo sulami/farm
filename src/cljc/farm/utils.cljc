@@ -18,11 +18,6 @@
   [value pred f]
   (if pred (f value) value))
 
-(defn set-in
-  "Like update in, but just sets."
-  [m ks v]
-  (update-in m ks (constantly v)))
-
 (defn insert-at
   "Inserts elm into coll at idx, overwriting whatever was there before."
   [elm idx coll]
@@ -83,5 +78,5 @@
 (defn lose
   "Incognicto event handler that sends out a message describing the loss."
   [db reason]
-  {:db (set-in db [:alive] false)
+  {:db (assoc-in db [:alive] false)
    :dispatch [:send-message (reason config/loss-messages)]})

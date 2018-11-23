@@ -2,8 +2,7 @@
   (:require [clojure.test :refer :all]
             [farm.economy :refer :all]
             [farm.events :refer [initialize-db]]
-            [farm.config :as config]
-            [farm.utils :refer [set-in]]))
+            [farm.config :as config]))
 
 (deftest resource-price-key-test
   (testing "is appending '-price'"
@@ -30,8 +29,8 @@
 
   (testing "food isn't reduced below zero"
     (let* [db (-> (initialize-db {} [:initialize-db])
-                  (set-in [:family] [1 2 3])
-                  (set-in [:food] 1))
+                  (assoc-in [:family] [1 2 3])
+                  (assoc-in [:food] 1))
            family (-> db :family count)
            db' (consume-food-handler db [:consume-food])]
       (is (= 0

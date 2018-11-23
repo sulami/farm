@@ -104,7 +104,7 @@
   (testing "it triggers loss if running out of food"
     (is (= [:lose :starving]
            (-> default-db
-               (set-in [:food] 0)
+               (assoc-in [:food] 0)
                wrap-db-helper
                (check-lose-handler [:check-lose])
                :dispatch))))
@@ -112,14 +112,14 @@
   (testing "it triggers loss if in negative standing"
     (is (= [:lose :debt]
            (-> default-db
-               (set-in [:money] -1)
+               (assoc-in [:money] -1)
                wrap-db-helper
                (check-lose-handler [:check-lose])
                :dispatch))))
 
   (testing "it doesn't trigger loss if at zero money"
     (is (-> default-db
-            (set-in [:money] 0)
+            (assoc-in [:money] 0)
             wrap-db-helper
             (check-lose-handler [:check-lose])
             :dispatch
@@ -128,16 +128,16 @@
   (testing "it triggers loss if too cold and out of wood"
     (is (= [:lose :freezing]
            (-> default-db
-               (set-in [:temperature] (- config/livable-temperature 2))
-               (set-in [:wood] 0)
+               (assoc-in [:temperature] (- config/livable-temperature 2))
+               (assoc-in [:wood] 0)
                wrap-db-helper
                (check-lose-handler [:check-lose])
                :dispatch))))
 
   (testing "it doesn't trigger loss if too cold but has wood"
     (is (-> default-db
-            (set-in [:temperature] (- config/livable-temperature 2))
-            (set-in [:wood] 10)
+            (assoc-in [:temperature] (- config/livable-temperature 2))
+            (assoc-in [:wood] 10)
             wrap-db-helper
             (check-lose-handler [:check-lose])
             :dispatch
@@ -145,8 +145,8 @@
 
   (testing "it doesn't trigger loss if out of wood but warm"
     (is (-> default-db
-            (set-in [:temperature] config/livable-temperature)
-            (set-in [:wood] 0)
+            (assoc-in [:temperature] config/livable-temperature)
+            (assoc-in [:wood] 0)
             wrap-db-helper
             (check-lose-handler [:check-lose])
             :dispatch

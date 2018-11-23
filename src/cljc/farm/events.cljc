@@ -9,7 +9,7 @@
             [farm.messages :refer [send-message]]
             [farm.plant :refer [harvest-handler plant-seeds-handler update-plants water-plants]]
             [farm.resource :refer [chop-wood-handler hunt-handler]]
-            [farm.utils :refer [check-lose-handler lose set-in]]
+            [farm.utils :refer [check-lose-handler lose]]
             [farm.views :refer [timer]]))
 
 ;; Spec Validation
@@ -68,7 +68,7 @@
  :update-temperature
  db-spec-interceptors
  (fn update-temperature-handler [db _]
-   (set-in db [:temperature]
+   (assoc-in db [:temperature]
            (-> db
                :game-time
                (temperature (:weather db))))))
@@ -88,9 +88,9 @@
  db-spec-interceptors
  (fn update-prices-handler [db _]
    (-> db
-       (set-in [:food-price] (resource-price))
-       (set-in [:seed-price] (resource-price))
-       (set-in [:wood-price] (resource-price)))))
+       (assoc-in [:food-price] (resource-price))
+       (assoc-in [:seed-price] (resource-price))
+       (assoc-in [:wood-price] (resource-price)))))
 
 (reg-event-db
  :update-plants
@@ -136,13 +136,13 @@
  :delayed-action
  (fn delayed-action-handler
    [{:keys [db]} [_ delay action]]
-   {:db (set-in db [:activity] [action delay])
+   {:db (assoc-in db [:activity] [action delay])
     :dispatch-later [{:ms delay :dispatch [:finish-action action]}]}))
 
 (reg-event-fx
  :finish-action
  (fn finish-action-handler [{:keys [db]} [_ action]]
-   {:db (set-in db [:activity] [[:idle] 0])
+   {:db (assoc-in db [:activity] [[:idle] 0])
     :dispatch action}))
 
 (reg-event-db

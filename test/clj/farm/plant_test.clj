@@ -3,7 +3,7 @@
              [farm.config :as config]
              [farm.events :refer [initialize-db]]
              [farm.plant :refer :all]
-             [farm.utils :refer [insert-at set-in]]))
+             [farm.utils :refer [insert-at]]))
 
 (def default-weather (first config/weathers))
 
@@ -75,7 +75,7 @@
 
   (testing "it kills plants if they run out of water"
     (is (-> config/new-plant
-            (set-in [:water] 0)
+            (assoc-in [:water] 0)
             (plant-alive? default-weather 10)
             not)))
 
@@ -136,7 +136,7 @@
 
   (testing "with plants running low on water"
     (let* [db (initialize-db {} [:initialize-db])
-           low-water-plant (set-in config/new-plant [:water] 1)
+           low-water-plant (assoc-in config/new-plant [:water] 1)
            db' (-> db
                    (update-in [:plants] (partial insert-at low-water-plant 0))
                    (update-plants [:update-plants]))]
@@ -152,7 +152,7 @@
 
   (testing "with weather"
     (let* [medium-water (/ config/max-plant-water 2)
-           medium-water-plant (set-in config/new-plant [:water] medium-water)
+           medium-water-plant (assoc-in config/new-plant [:water] medium-water)
            db (-> (initialize-db {} [:intitialize-db])
                   (update-in [:plants] (partial insert-at medium-water-plant 0)))]
 
@@ -161,7 +161,7 @@
          (for [weather config/weathers]
            (is (= (:water-mod weather)
                   (-> db
-                      (set-in [:weather] weather)
+                      (assoc-in [:weather] weather)
                       (update-plants [:update-plants])
                       :plants
                       first
@@ -189,7 +189,7 @@
                  (-> db' :food))))))
 
     (testing "with a mature plant"
-      (let* [mature-plant (set-in config/new-plant [:age] config/plant-age)
+      (let* [mature-plant (assoc-in config/new-plant [:age] config/plant-age)
              db (-> db
                     (grow-plants-helper 2)
                     (update-in [:plants] #(insert-at mature-plant 3 %)))

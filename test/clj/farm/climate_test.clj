@@ -2,7 +2,6 @@
   (:require  [clojure.test :refer :all]
              [farm.climate :refer :all]
              [farm.events :refer [initialize-db]]
-             [farm.utils :refer [set-in]]
              [farm.config :as config]))
 
 (def default-weather (first config/weathers))
@@ -49,14 +48,14 @@
     (testing "it consumes no wood above livable temperature"
       (is (= (:wood db)
              (-> db
-                 (set-in [:temperature] config/livable-temperature)
+                 (assoc-in [:temperature] config/livable-temperature)
                  (consume-wood-handler [:consume-wood])
                  :wood))))
 
     (testing "it consumes some wood below livable temperature"
       (is (= (:wood db)
              (-> db
-                 (set-in [:temperature] (- config/livable-temperature 4))
+                 (assoc-in [:temperature] (- config/livable-temperature 4))
                  (consume-wood-handler [:consume-wood])
                  :wood
                  (+ 2)))))
@@ -64,7 +63,7 @@
     (testing "it consumes some more wood far below livable temperature"
       (is (= (:wood db)
              (-> db
-                 (set-in [:temperature] (- config/livable-temperature 8))
+                 (assoc-in [:temperature] (- config/livable-temperature 8))
                  (consume-wood-handler [:consume-wood])
                  :wood
                  (+ 4)))))
@@ -72,7 +71,7 @@
     (testing "it doesn't consume more wood then there is"
       (is (= 0
              (-> db
-                 (set-in [:temperature] (- config/livable-temperature 8))
-                 (set-in [:wood] 1)
+                 (assoc-in [:temperature] (- config/livable-temperature 8))
+                 (assoc-in [:wood] 1)
                  (consume-wood-handler [:consume-wood])
                  :wood))))))
